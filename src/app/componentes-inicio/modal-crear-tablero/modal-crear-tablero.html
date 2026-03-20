@@ -1,0 +1,94 @@
+<div class="modal-backdrop" (click)="close.emit()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <div class="modal-hdr">
+      <h3 class="modal-title">Crear Nuevo Tablero</h3>
+      <button class="btn-xsm" (click)="close.emit()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Nombre del tablero</label>
+        <input type="text" class="form-control" [(ngModel)]="nombre" placeholder="Ej: Proyecto Marketing" autofocus>
+      </div>
+      
+      <div class="form-group mt-3">
+        <label>Descripción (Opcional)</label>
+        <textarea class="form-control" [(ngModel)]="descripcion" placeholder="Detalles del tablero..."></textarea>
+      </div>
+
+      <div class="form-group mt-3">
+        <label>Plantilla (Estructura inicial)</label>
+        <div class="templates-grid">
+          @for (tpl of templates; track tpl.id) {
+            <button class="template-card" 
+                    [class.selected]="selectedTemplateId === tpl.id"
+                    (click)="selectedTemplateId = tpl.id">
+              <div class="tpl-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path [attr.d]="tpl.icon" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </div>
+              <span class="tpl-name">{{ tpl.name }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="form-group mt-3">
+        <label>Fondo</label>
+        
+        <div class="bg-preview" 
+             [ngClass]="!isImage(portada) ? portada : ''" 
+             [style.backgroundImage]="isImage(portada) ? portada : ''">
+          <div class="preview-card">
+            <span class="preview-title">{{ nombre || 'Nombre del tablero' }}</span>
+          </div>
+        </div>
+
+        <div class="picker-section">
+          <span>Colores</span>
+          <div class="color-picker mb-2">
+            @for (c of colors; track c) {
+              <button class="color-opt" 
+                      [ngClass]="c" 
+                      [class.selected]="portada === c"
+                      (click)="portada = c">
+              </button>
+            }
+          </div>
+          
+          <span>Imágenes</span>
+          <div class="image-picker">
+            @for (img of images; track img) {
+              <button class="img-opt" 
+                      [style.backgroundImage]="img"
+                      [class.selected]="portada === img"
+                      (click)="portada = img">
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-confirm" 
+              [disabled]="!nombre || isGeneratingColumns" 
+              (click)="crear()">
+        @if (isGeneratingColumns) {
+          <svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
+          Creando estructura...
+        } @else {
+          Crear Tablero
+        }
+      </button>
+    </div>
+
+  </div>
+</div>

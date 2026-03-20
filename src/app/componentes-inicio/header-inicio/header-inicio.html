@@ -1,0 +1,51 @@
+<!-- header-inicio.component.html -->
+<header class="topbar">
+  <span class="topbar-title">Mis Tableros</span>
+  <span class="topbar-meta" id="boardCount">{{ boardService.boards().length || 0 }} tableros</span>
+
+  <div class="topbar-actions">
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" 
+             placeholder="Buscar tableros…" 
+             [value]="boardService.boardSearchQuery()" 
+             (input)="boardService.boardSearchQuery.set($any($event.target).value)">
+    </div>
+    <!-- Theme Selector Dropdown -->
+    <div class="theme-dropdown-wrap">
+      <button class="btn-theme-selector" (click)="showThemeMenu.set(!showThemeMenu())">
+        <div class="current-dot"></div>
+        Tema
+      </button>
+
+      @if (showThemeMenu()) {
+        <div class="theme-menu" (click)="showThemeMenu.set(false)">
+          <button class="theme-item light" (click)="themeService.setTheme('light')" [class.active]="themeService.currentTheme() === 'light'">
+            <i></i> Claro
+          </button>
+          <button class="theme-item dark" (click)="themeService.setTheme('dark')" [class.active]="themeService.currentTheme() === 'dark'">
+            <i></i> Oscuro
+          </button>
+          <button class="theme-item purple" (click)="themeService.setTheme('purple')" [class.active]="themeService.currentTheme() === 'purple'">
+            <i></i> Ametista
+          </button>
+          <button class="theme-item emerald" (click)="themeService.setTheme('emerald')" [class.active]="themeService.currentTheme() === 'emerald'">
+            <i></i> Esmeralda
+          </button>
+          <button class="theme-item rose" (click)="themeService.setTheme('rose')" [class.active]="themeService.currentTheme() === 'rose'">
+            <i></i> Sakura
+          </button>
+          <button class="theme-item ocean" (click)="themeService.setTheme('ocean')" [class.active]="themeService.currentTheme() === 'ocean'">
+            <i></i> Océano
+          </button>
+          <button class="theme-item sunset" (click)="themeService.setTheme('sunset')" [class.active]="themeService.currentTheme() === 'sunset'">
+            <i></i> Atardecer
+          </button>
+          <button class="theme-item forest" (click)="themeService.setTheme('forest')" [class.active]="themeService.currentTheme() === 'forest'">
+            <i></i> Bosque
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</header>

@@ -1,0 +1,279 @@
+<section id="demo" class="demo-section">
+  <div class="container">
+    <div class="demo-header">
+      <h2 class="demo-title">Mira TaskFlow en acción</h2>
+      <p class="demo-subtitle">Una interfaz familiar, potente y diseñada para la productividad.</p>
+    </div>
+
+    <!-- SIMULATED APP WINDOW -->
+    <div class="demo-window">
+      <!-- Window Title Bar -->
+      <div class="window-bar">
+        <div class="window-controls">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+        </div>
+        <div class="window-tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+            <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+            <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+            <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+          </svg>
+          {{ board().nombre }}
+        </div>
+        <button class="play-btn" [class.playing]="isPlaying()" (click)="isPlaying() ? stopDemo() : playDemo()">
+          <svg *ngIf="!isPlaying()" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+          <span *ngIf="isPlaying()" class="loader"></span>
+          {{ isPlaying() ? 'Simulando...' : 'Ver Demo Automática' }}
+        </button>
+      </div>
+
+      <!-- APP SHELL REPLICA -->
+      <div class="app-shell" [ngClass]="board().portada">
+        
+        <!-- SIDEBAR REPLICA -->
+        <aside class="sidebar">
+          <div class="sb-brand">
+            <span class="sb-logo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+                <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+                <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+                <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+              </svg>
+            </span>
+            <span class="sb-brand-name">TaskFlow</span>
+          </div>
+
+          <div class="sb-banner">
+            <div class="sb-stripe" [ngClass]="board().portada"></div>
+            <div class="sb-banner-body">
+              <div class="sb-banner-name">{{ board().nombre }}</div>
+              <div class="sb-stats">
+                <span class="bbs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="4" rx="1"/><rect x="3" y="10" width="18" height="4" rx="1"/><rect x="3" y="17" width="10" height="4" rx="1"/></svg> {{ columns().length }}</span>
+                <span class="bbs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg> {{ totalCards }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sb-scroll">
+            <nav>
+              <div class="nav-group">
+                <div class="nav-lbl">Vista de Tablero</div>
+                <button class="nav-link" [class.active]="activeTab() === 'boards'" (click)="setTab('boards')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                  Tablero Kanban
+                </button>
+                <button class="nav-link" [class.active]="activeTab() === 'tasks'" (click)="setTab('tasks')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/></svg>
+                  Lista Completa
+                </button>
+              </div>
+
+              <div class="nav-group">
+                <div class="nav-lbl">Dashboard</div>
+                <button class="nav-link" [class.active]="activeTab() === 'reminders'" (click)="setTab('reminders')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/></svg>
+                  Pendientes
+                </button>
+                <button class="nav-link" [class.active]="activeTab() === 'activity'" (click)="setTab('activity')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                  Actividad
+                </button>
+              </div>
+
+              <div class="nav-group">
+                <div class="nav-lbl">Equipo</div>
+                <button class="nav-link" [class.active]="activeTab() === 'team'" (click)="setTab('team')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  Miembros ({{ board().miembros.length }})
+                </button>
+              </div>
+            </nav>
+          </div>
+        </aside>
+
+        <!-- MAIN CONTENT REPLICA -->
+        <main class="main">
+          <!-- TOPBAR -->
+          <header class="topbar">
+            <div class="tb-back">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+              Tableros
+            </div>
+            <div class="tb-sep"></div>
+            <div class="board-title-input">{{ board().nombre }}</div>
+            
+            <div class="tb-acts">
+              <div class="m-stack">
+                @for (m of board().miembros; track m.id) {
+                  <div class="m-av" [style.background]="m.color">{{ m.initials }}</div>
+                }
+              </div>
+              <div class="tb-sep"></div>
+              <button class="btn-sm primary">Compartir</button>
+            </div>
+          </header>
+
+          <!-- CANVAS -->
+          <div class="canvas-wrapper">
+            
+            <!-- BOARD VIEW -->
+            @if (activeTab() === 'boards') {
+              <div class="canvas">
+                @for (col of columns(); track col.id) {
+                  <div class="col">
+                    <div class="col-hdr">
+                      <span class="col-title">{{ col.nombre }}</span>
+                      <span class="col-count">{{ col.cards.length }}</span>
+                    </div>
+                    <div class="col-body">
+                      @for (card of col.cards; track card.id) {
+                        <div class="card">
+                          <div class="card-tags">
+                            @for (tid of card.tags; track tid) {
+                              <div class="c-tag" [style.background]="getTag(tid)?.color"></div>
+                            }
+                          </div>
+                          <div class="card-title">{{ card.titulo }}</div>
+                          <div class="card-footer">
+                            <span class="c-badge" [ngClass]="'prio-' + card.prioridad">{{ card.prioridad }}</span>
+                            @if (card.checklist) {
+                              <span class="c-badge badge-chk">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                                {{ card.checklist.done }}/{{ card.checklist.tot }}
+                              </span>
+                            }
+                            @let mem = getMember(card.assigned);
+                            @if (mem) {
+                              <div class="c-av" [style.background]="mem.color">{{ mem.initials }}</div>
+                            }
+                          </div>
+                        </div>
+                      }
+                      <button class="add-card-btn">+ Agregar tarjeta</button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- LIST VIEW -->
+            @if (activeTab() === 'tasks') {
+              <div class="list-view">
+                <div class="view-header">
+                  <h2>Vista de Lista</h2>
+                  <span class="view-stats">{{ totalCards }} tareas en total</span>
+                </div>
+                <table class="lv-table">
+                  <thead>
+                    <tr><th>Tarea</th><th>Estado</th><th>Prioridad</th><th>Responsable</th></tr>
+                  </thead>
+                  <tbody>
+                    @for (col of columns(); track col.id) {
+                      @for (card of col.cards; track card.id) {
+                        <tr class="lv-row">
+                          <td><span class="lv-title">{{ card.titulo }}</span></td>
+                          <td><span class="view-list-name">{{ col.nombre }}</span></td>
+                          <td><span class="prio-pill-sm" [ngClass]="card.prioridad">{{ card.prioridad }}</span></td>
+                          <td>
+                            <div class="mem-av-sm" [style.background]="getMember(card.assigned)?.color">
+                              {{ getMember(card.assigned)?.initials }}
+                            </div>
+                          </td>
+                        </tr>
+                      }
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+
+            <!-- PENDIENTES VIEW -->
+            @if (activeTab() === 'reminders') {
+              <div class="panel-view">
+                <div class="view-header">
+                  <h2>Mis tareas pendientes</h2>
+                  <span class="view-stats">{{ reminders().length }} recordatorios</span>
+                </div>
+                <div class="panel-body">
+                  @for (t of reminders(); track t.id) {
+                    <div class="task-row">
+                      <div class="task-check" [class.done]="t.completado">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                      </div>
+                      <div class="task-info">
+                        <div class="task-title" [class.completed]="t.completado">{{ t.card_titulo }}</div>
+                        <div class="task-meta">
+                          <span class="task-type-tag">{{ t.tipo }}</span>
+                        </div>
+                      </div>
+                      @if (t.fecha_recordatorio) {
+                        <span class="task-due" [class.overdue]="t.id === 3" [class.upcoming]="t.id === 1 || t.id === 2">
+                          {{ t.fecha_recordatorio | date:'shortDate' }}
+                        </span>
+                      } @else {
+                        <span class="task-due none">—</span>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- ACTIVITY VIEW -->
+            @if (activeTab() === 'activity') {
+              <div class="panel-view">
+                <div class="view-header">
+                  <h2>Actividad reciente</h2>
+                  <span class="view-stats">Últimas acciones</span>
+                </div>
+                <div class="panel-body">
+                  @for (a of activity(); track a.id) {
+                    <div class="activity-item">
+                      <div class="act-av">{{ a.usuario_nombre.charAt(0) }}</div>
+                      <div>
+                        <div class="act-text">
+                          <strong>{{ a.usuario_nombre }}</strong> {{ a.descripcion }}
+                          <span class="act-board">en {{ a.board_nombre }}</span>
+                        </div>
+                        <div class="act-time">{{ a.fecha }}</div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- TEAM VIEW -->
+            @if (activeTab() === 'team') {
+              <div class="team-view">
+                <div class="view-header">
+                  <h2>Equipo del Proyecto</h2>
+                </div>
+                <div class="team-grid">
+                  @for (m of board().miembros; track m.id) {
+                    <div class="team-card">
+                      <div class="team-av-lg" [style.background]="m.color">{{ m.initials }}</div>
+                      <div class="team-info">
+                        <h3>{{ m.nombre }}</h3>
+                        <span class="role-pill" [ngClass]="m.rol">{{ m.rol }}</span>
+                        <p class="team-email">{{ m.nombre.toLowerCase().replace(' ', '.') }}@taskflow.com</p>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+          </div>
+        </main>
+      </div>
+
+    </div>
+  </div>
+</section>

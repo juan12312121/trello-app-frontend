@@ -1,0 +1,105 @@
+<div class="panel">
+  <!-- HEADER -->
+  <div class="chat-head">
+    <div class="chat-head-left">
+      <div class="chat-head-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+      </div>
+      <div>
+        <h4>Canal del Tablero</h4>
+        <small>@if(loading()){ Cargando historial... }@else{ Miembros activos }</small>
+      </div>
+    </div>
+    <button class="close-btn" (click)="close.emit()" title="Cerrar chat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+
+  <!-- MESSAGES AREA -->
+  <div class="msg-list" #msgList>
+    
+    <!-- SEARCH BAR -->
+    <div class="chat-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" [(ngModel)]="searchQuery" placeholder="Buscar en el chat...">
+    </div>
+
+    @if (filteredMessages().length === 0 && !loading()) {
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </div>
+        <p>No se encontraron mensajes</p>
+      </div>
+    }
+
+    @for (msg of filteredMessages(); track msg.id; let i = $index) {
+      <div class="msg-group" [class.mine]="isMine(msg)" [class.theirs]="!isMine(msg)">
+        <!-- Show avatar and name only for first message in group (theirs) -->
+        @if (!isMine(msg) && (i === 0 || filteredMessages()[i-1].userId !== msg.userId)) {
+          <div class="avatar" [class.online]="isOnline(msg.userId)">
+            {{ getInitials(msg.userName) }}
+          </div>
+          <span class="msg-sender">{{ msg.userName }}</span>
+        }
+
+        <div class="msg-bubble-wrap">
+          <div class="msg-bubble" [title]="formatTime(msg.timestamp)">
+            {{ msg.text }}
+            <span class="bubble-time">{{ formatTime(msg.timestamp) }}</span>
+          </div>
+          
+          <!-- REACTION BUTTON -->
+          <div class="bubble-actions">
+            <button class="btn-react" (click)="toggleReaction(msg.id, '👍')">👍</button>
+            <button class="btn-react" (click)="toggleReaction(msg.id, '❤️')">❤️</button>
+            <button class="btn-react" (click)="toggleReaction(msg.id, '🔥')" *ngIf="isMine(msg)">🔥</button>
+          </div>
+        </div>
+
+        <!-- REACTIONS DISPLAY -->
+        @if (msg.reactions && msg.reactions.length > 0) {
+          <div class="msg-reactions">
+            @for (g of getGroupedReactions(msg); track g.emoji) {
+              <button class="reaction-tag" [class.me]="g.me" (click)="toggleReaction(msg.id, g.emoji)">
+                {{ g.emoji }} <span>{{ g.count }}</span>
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- TYPING INDICATOR -->
+    @if (typingUser() && typingUser() !== currentUser?.nombre) {
+      <div class="typing-box">
+        <div class="typing-dots"><span></span><span></span><span></span></div>
+        <small>{{ typingUser() }} está escribiendo...</small>
+      </div>
+    }
+  </div>
+
+  <!-- INPUT AREA -->
+  <div class="input-row">
+    <textarea class="msg-input"
+      [(ngModel)]="newMessage"
+      (keydown)="onKeydown($event)"
+      placeholder="Escribe un mensaje..."
+      rows="1"
+      #chatInput></textarea>
+    
+    <button class="send-btn" (click)="sendMessage()" [disabled]="!newMessage.trim()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
+    </button>
+  </div>
+</div>

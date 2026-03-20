@@ -1,0 +1,46 @@
+<div class="overlay" (click)="closed.emit()">
+  <div class="modal-sm" (click)="$event.stopPropagation()">
+
+    <div class="modal-hdr">
+      <span class="modal-title">Invitar miembro</span>
+      <button class="modal-x" (click)="closed.emit()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="form-group">
+        <label class="form-lbl">Correo electrónico del invitado</label>
+        <input
+          class="form-input"
+          type="email"
+          placeholder="Ej. maria@empresa.com"
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)">
+        <p style="font-size: 0.75rem; color: var(--t3); margin-top: 5px;">Se enviará una invitación a este correo y podrá gestionarla en su cuenta.</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-lbl">Rol</label>
+        <select class="form-select"
+          [value]="selectedRol()"
+          (change)="selectedRol.set($any($event.target).value)">
+          <option value="editor">Editor — crear y editar tareas</option>
+          <option value="comentador">Comentador — solo ver y comentar</option>
+          <option value="viewer">Viewer — solo lectura</option>
+          <option value="admin">Admin — control total</option>
+        </select>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-full ghost" (click)="closed.emit()">Cancelar</button>
+        <button class="btn-full primary" (click)="confirm()">Enviar invitación</button>
+      </div>
+
+    </div>
+  </div>
+</div>

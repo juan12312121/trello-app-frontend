@@ -1,0 +1,86 @@
+.how-section {
+  padding: 5rem 2rem;
+  max-width: 1300px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.section-header { margin-bottom: 3.5rem; }
+.section-header h2 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #0f172a;
+}
+.section-header p { font-size: 1.05rem; color: #475569; }
+
+.steps-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.step {
+  flex: 1;
+  min-width: 220px;
+  max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 1rem;
+}
+
+.step-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #3b82f6;          /* ← azul sólido, no transparente */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  box-shadow: 0 6px 20px rgba(59,130,246,.35);
+}
+
+/* ícono blanco dentro del círculo azul */
+.step-circle .material-icons {
+  color: white;
+  font-size: 30px;
+}
+
+.step-num {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #3b82f6;
+  margin-bottom: 0.5rem;
+}
+
+.step h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+  color: #0f172a;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.step p {
+  font-size: 0.9rem;
+  color: #475569;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.step-arrow {
+  display: flex;
+  align-items: center;
+  padding-top: 36px;
+  color: #94a3b8;
+}
+.step-arrow .material-icons { font-size: 24px; }
+
+@media (max-width: 700px) {
+  .step-arrow { display: none; }
+}

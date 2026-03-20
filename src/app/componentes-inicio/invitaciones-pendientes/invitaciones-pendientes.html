@@ -1,0 +1,26 @@
+@if (!loading() && invitations().length > 0) {
+  <div class="invitations-container">
+    <div class="inv-header">
+      <h3>Invitaciones pendientes ({{ invitations().length }})</h3>
+    </div>
+    
+    <div class="inv-list">
+      @for (inv of invitations(); track inv.id) {
+        <div class="inv-card">
+          <div class="inv-board-color" [ngClass]="inv.board_portada || 'c-blue'"></div>
+          <div class="inv-content">
+            <div class="inv-text">
+              <strong>{{ inv.invitador_nombre }}</strong> te ha invitado al tablero
+              <strong>{{ inv.board_nombre }}</strong> como <em>{{ inv.rol }}</em>.
+            </div>
+            <div class="inv-date">{{ inv.fecha_creacion | date:'mediumDate' }}</div>
+            <div class="inv-actions">
+              <button class="btn-reject" (click)="reject(inv.id)">Rechazar</button>
+              <button class="btn-accept" (click)="accept(inv.id)">Aceptar</button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

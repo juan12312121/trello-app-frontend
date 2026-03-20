@@ -1,1 +1,235 @@
-/* You can add global styles to this file, and also import other style files */
+html, body { height: 100%; }
+body { 
+  margin: 0; 
+  font-family: 'Inter', 'Plus Jakarta Sans', -apple-system, sans-serif; 
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  /* Common */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --r-sm: 6px; --r-md: 10px; --r-lg: 14px; --r-xl: 20px; --r-f: 9999px;
+  --sh-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --sh-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --sh-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+  /* Light Theme (Default) */
+  --blue: #2563eb; --blue-d: #1d4ed8; --blue-l: #eff6ff;
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --s2: #f1f5f9;
+  --s3: #e2e8f0;
+  --bd: rgba(0, 0, 0, 0.08);
+  --bd2: rgba(0, 0, 0, 0.12);
+  --t1: #0f172a;
+  --t2: #334155;
+  --t3: #64748b;
+  --glass: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="dark"] {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --s2: #334155;
+  --s3: #475569;
+  --bd: rgba(255, 255, 255, 0.1);
+  --bd2: rgba(255, 255, 255, 0.15);
+  --t1: #f8fafc;
+  --t2: #cbd5e1;
+  --t3: #94a3b8;
+  --blue-l: rgba(37, 99, 235, 0.15);
+  --glass: rgba(15, 23, 42, 0.7);
+  --sh-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --sh-md: 0 4px 6px -1px rgba(0,0,0,0.4);
+  --sh-lg: 0 10px 25px -3px rgba(0,0,0,0.5);
+}
+
+[data-theme="purple"] {
+  --bg: #1a1033;
+  --surface: #2d1b4d;
+  --s2: #3e2b5e;
+  --s3: #4f3c70;
+  --blue: #a855f7;
+  --blue-d: #9333ea;
+  --bd: rgba(168, 85, 247, 0.2);
+  --t1: #f3e8ff;
+  --t2: #e9d5ff;
+  --t3: #d8b4fe;
+  --glass: rgba(26, 16, 51, 0.8);
+}
+
+[data-theme="emerald"] {
+  --bg: #061a14;
+  --surface: #0a2d24;
+  --s2: #114136;
+  --s3: #1a5647;
+  --blue: #10b981;
+  --blue-d: #059669;
+  --bd: rgba(16, 185, 129, 0.2);
+  --t1: #ecfdf5;
+  --t2: #d1fae5;
+  --t3: #a7f3d0;
+  --glass: rgba(6, 26, 20, 0.8);
+}
+
+[data-theme="rose"] {
+  --bg: #1f080e;
+  --surface: #3a101b;
+  --s2: #541829;
+  --s3: #6e1f37;
+  --blue: #f43f5e;
+  --blue-d: #e11d48;
+  --bd: rgba(244, 63, 94, 0.2);
+  --t1: #fff1f2;
+  --t2: #ffe4e6;
+  --t3: #fecdd3;
+  --glass: rgba(31, 8, 14, 0.8);
+}
+
+[data-theme="ocean"] {
+  --bg: #051923;
+  --surface: #003554;
+  --s2: #006494;
+  --s3: #0582ca;
+  --blue: #00a6fb;
+  --blue-d: #0087cc;
+  --bd: rgba(0, 166, 251, 0.2);
+  --t1: #e0f2fe;
+  --t2: #bae6fd;
+  --t3: #7dd3fc;
+  --glass: rgba(5, 25, 35, 0.8);
+}
+
+[data-theme="sunset"] {
+  --bg: #1c0f0a;
+  --surface: #3d1c12;
+  --s2: #5c2a1a;
+  --s3: #7a3a23;
+  --blue: #f97316;
+  --blue-d: #ea580c;
+  --bd: rgba(249, 115, 22, 0.2);
+  --t1: #fff7ed;
+  --t2: #ffedd5;
+  --t3: #fed7aa;
+  --glass: rgba(28, 15, 10, 0.8);
+}
+
+[data-theme="forest"] {
+  --bg: #0d120a;
+  --surface: #1a2313;
+  --s2: #26341b;
+  --s3: #334524;
+  --blue: #84cc16;
+  --blue-d: #65a30d;
+  --bd: rgba(132, 204, 22, 0.2);
+  --t1: #f7fee7;
+  --t2: #ecfccb;
+  --t3: #d9f99d;
+  --glass: rgba(13, 18, 10, 0.8);
+}
+
+/* Theme Selector Dropdown */
+.theme-dropdown-wrap {
+  position: relative;
+}
+
+.btn-theme-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--s2);
+  border: 1px solid var(--bd);
+  padding: 6px 12px;
+  border-radius: 12px;
+  color: var(--t1);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-theme-selector:hover {
+  background: var(--s3);
+  border-color: var(--blue);
+}
+
+.btn-theme-selector .current-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.2);
+  background: var(--blue);
+}
+
+.theme-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 180px;
+  background: var(--surface);
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  box-shadow: var(--sh-lg);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 1000;
+  animation: slideTop 0.2s ease-out;
+}
+
+@keyframes slideTop {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.theme-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  width: 100%;
+  color: var(--t2);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.theme-item i {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+/* Item colors */
+.theme-item.light i   { background: #ffffff; }
+.theme-item.dark i    { background: #1e293b; }
+.theme-item.purple i  { background: #a855f7; }
+.theme-item.emerald i { background: #10b981; }
+.theme-item.rose i    { background: #f43f5e; }
+.theme-item.ocean i   { background: #00a6fb; }
+.theme-item.sunset i  { background: #f97316; }
+.theme-item.forest i  { background: #84cc16; }
+
+.theme-item:hover {
+  background: var(--s2);
+  color: var(--t1);
+  transform: translateX(4px);
+}
+
+.theme-item.active {
+  background: var(--blue-l);
+  color: var(--blue);
+  font-weight: 600;
+}
+
+.th-dot { background: var(--blue); }
+

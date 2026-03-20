@@ -1,0 +1,33 @@
+<footer class="site-footer">
+  <div class="footer-inner">
+
+    <!-- Brand -->
+    <div class="footer-brand">
+      <div class="logo">Task<span>Flow</span></div>
+      <p>La herramienta de gestión de proyectos que tu equipo necesita para ser más productivo.</p>
+    </div>
+
+    <!-- Columnas generadas desde el array columns -->
+    @for (col of columns; track col.title) {
+      <div class="footer-col">
+        <h4>{{ col.title }}</h4>
+        <ul>
+          @for (link of col.links; track link.label) {
+            <li>
+              @if (link.isRoute) {
+                <a [routerLink]="link.href">{{ link.label }}</a>
+              } @else {
+                <a [href]="link.href">{{ link.label }}</a>
+              }
+            </li>
+          }
+        </ul>
+      </div>
+    }
+
+  </div>
+
+  <div class="footer-bottom">
+    <span>&copy; {{ year }} TaskFlow. Todos los derechos reservados.</span>
+  </div>
+</footer>

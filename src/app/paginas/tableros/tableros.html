@@ -1,0 +1,224 @@
+@if (board()) {
+<div class="app-shell" [class.focus-mode]="focusMode()"
+  [ngClass]="!isImage(board().portada) ? (board().portada || 'c-blue') : ''"
+  [style.backgroundImage]="isImage(board().portada) ? board().portada : ''" [style.backgroundSize]="'cover'"
+  [style.backgroundPosition]="'center'">
+
+  <!-- SIDEBAR -->
+  <app-sidebar class="shell-sidebar" [board]="board()" [lists]="lists()" [tags]="tags()" [activity]="activity()"
+    [otherBoards]="otherBoards()"
+    [cmap]="{ 'c-blue': '#93c5fd', 'c-purple': '#a78bfa', 'c-green': '#34d399', 'c-orange': '#fb923c', 'c-pink': '#f472b6', 'c-red': '#f87171' }"
+    [overdueCount]="overdueCount" [myTasksCount]="myTasksCount" [archivedCount]="archivedCount"
+    [attachmentsCount]="attachmentsCount" [activeView]="viewMode()" [activeFilter]="filterBy()"
+    (viewChanged)="onViewChanged($event)" (filterChanged)="onFilterChanged($event)" (logout)="handleLogout()"
+    (openInvite)="showInviteModal.set(true)" (openSettings)="showSettingsModal.set(true)"
+    (openProfile)="showProfileModal.set(true)" (backgroundChanged)="onBackgroundChanged($event)">
+  </app-sidebar>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR (incluye cover-stripe) -->
+    <app-topbar [board]="board()" [isAdmin]="isAdmin()" [canEdit]="canEdit()" (openInvite)="openInvite()"
+      (openCreateCard)="openCreateCard(null)" (openSettings)="showSettingsModal.set(true)"
+      (boardRenamed)="board().nombre = $event">
+    </app-topbar>
+
+    <!-- CHAT TOGGLE BUTTON -->
+    <button class="chat-toggle-btn" (click)="toggleChat()" [class.active]="showChat()" title="Chat del proyecto (G)">
+      <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </button>
+
+    <!-- CANVAS KANBAN -->
+    @if (viewMode() === 'kanban') {
+    <div class="canvas" cdkDropListGroup>
+
+      @for (list of activeLists(); track list.id) {
+      <app-columna-lista [list]="list" [tags]="tags()" [members]="board().miembros || []" [today]="today"
+        [canEdit]="canEdit()" (cardClicked)="openDetail($event)" (openCreateCard)="openCreateCard($event)"
+        (ctxMenu)="openCtx($event)" (listRenamed)="onListRenamed($event)" (inlineCardAdded)="onInlineCardAdded($event)"
+        (cardDropped)="onCardDropped($event)">
+      </app-columna-lista>
+      }
+
+      <!-- ADD COLUMN -->
+      <app-agregar-lista [canEdit]="canEdit()" (listAdded)="onListAdded($event)">
+      </app-agregar-lista>
+
+    </div>
+    } @else if (viewMode() === 'list') {
+    <div class="list-view-container">
+      <div class="list-view-header">
+        <h2>Vista de Lista</h2>
+        <div class="list-view-stats">
+          Mostrando {{ allCardsFiltered().length }} tarjetas
+          @if (filterBy()) {
+          (filtrado por {{ filterBy() }})
+          }
+        </div>
+      </div>
+
+      <table class="list-view-table">
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Lista</th>
+            <th>Asignado</th>
+            <th>Vencimiento</th>
+            <th>Prioridad</th>
+            <th>Tags</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (card of allCardsFiltered(); track card.id) {
+          <tr class="lv-row" (click)="openDetail(card.id)">
+            <td><span class="lv-title">{{ card.titulo }}</span></td>
+            <td><span class="view-list-name">{{ getListNameForCard(card) }}</span></td>
+            <td>
+              <div class="mem-av-sm" [style.background]="getMember(card.usuario_asignado_id)?.color"
+                *ngIf="card.usuario_asignado_id">
+                {{ getMember(card.usuario_asignado_id)?.initials }}
+              </div>
+              <span *ngIf="!card.usuario_asignado_id" class="lv-none">—</span>
+            </td>
+            <td>
+              <span class="lv-date" [class.over]="dueClass(card.fecha_vencimiento) === 'over'">
+                {{ fmtDate(card.fecha_vencimiento) }}
+              </span>
+            </td>
+            <td>
+              <span class="prio-pill-sm" [ngClass]="card.prioridad">
+                {{ card.prioridad }}
+              </span>
+            </td>
+            <td>
+              <div class="tags-mini">
+                @if (card.tags) {
+                @for (tid of card.tags; track tid) {
+                <span class="tag-dot-mini" [style.background]="getTag(tid)?.color"></span>
+                }
+                }
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+
+      @if (allCardsFiltered().length === 0) {
+      <div class="empty-view">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <path d="M9 9h6M9 13h6M9 17h3" />
+        </svg>
+        <p>No hay tarjetas que coincidan con estos criterios.</p>
+      </div>
+      }
+    </div>
+    } @else if (viewMode() === 'calendar') {
+    <div class="cal-container">
+      <div class="cal-header">
+        <button class="cal-nav-btn" (click)="prevMonth()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+        <h2 class="cal-month-title">{{ calendarHeader() }}</h2>
+        <button class="cal-nav-btn" (click)="nextMonth()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="cal-grid">
+        <!-- Días de la semana -->
+        <div class="cal-day-label">DOM</div>
+        <div class="cal-day-label">LUN</div>
+        <div class="cal-day-label">MAR</div>
+        <div class="cal-day-label">MIÉ</div>
+        <div class="cal-day-label">JUE</div>
+        <div class="cal-day-label">VIE</div>
+        <div class="cal-day-label">SÁB</div>
+
+        <!-- Celdas del mes -->
+        @for (day of calendarDays(); track day.date) {
+        <div class="cal-cell" [class.not-current]="!day.isCurrentMonth">
+          <span class="cal-date-num">{{ day.date.getDate() }}</span>
+          <div class="cal-cards">
+            @for (card of getCardsForDate(day.date); track card.id) {
+            <div class="cal-card-tiny" (click)="openDetail(card.id)"
+              [class.over]="dueClass(card.fecha_vencimiento) === 'over'"
+              [style.borderLeftColor]="card.tags && card.tags.length > 0 ? getTag(card.tags[0])?.color : 'transparent'">
+              {{ card.titulo }}
+            </div>
+            }
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+    }
+  </div>
+
+  <!-- FOCUS MODE EXIT BADGE -->
+  @if (focusMode()) {
+    <button class="focus-exit-btn" (click)="focusMode.set(false)" title="Salir del modo enfoque (F o Esc)">
+      <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      Salir del Modo Enfoque
+    </button>
+  }
+
+  <!-- CONTEXT MENU -->
+  <app-context-menu [open]="ctxOpen()" [x]="ctxX" [y]="ctxY" [isArchived]="ctxIsArchived()"
+    (action)="ctxAction($event)" (closed)="closeCtx()">
+  </app-context-menu>
+
+  <!-- MODAL: INVITAR MIEMBRO -->
+  @if (showInviteModal()) {
+  <app-modal-invitar (memberInvited)="onMemberInvited($event)" (closed)="closeInvite()">
+  </app-modal-invitar>
+  }
+
+  <!-- MODAL: CREAR TARJETA -->
+  @if (showCreateCardModal()) {
+  <app-modal-crear-tarjeta [lists]="activeLists()" [tags]="tags()" [members]="board().miembros || []"
+    [defaultListId]="createCardTargetListId()" (cardCreated)="onCardCreated($event)" (closed)="closeCreateCard()">
+  </app-modal-crear-tarjeta>
+  }
+
+  <!-- MODAL: DETALLE TARJETA -->
+  @if (showDetailModal() && activeCardDetail()) {
+  <app-modal-detalle-tarjeta [card]="activeCardDetail()!.card" [list]="activeCardDetail()!.list" [lists]="activeLists()"
+    [tags]="tags()" [members]="board().miembros || []" [today]="today" [canEdit]="canEdit()" [canComment]="canComment()"
+    [boardId]="board().id" (cardUpdated)="onCardUpdated($event)" (cardMoved)="onCardMoved($event)"
+    (cardDeleted)="onCardDeleted($event)" (tagToggled)="onTagToggled($event)" (tagCreated)="onTagCreated($event)"
+    (checklistToggled)="onChecklistToggled($event)" (checklistItemAdded)="onChecklistItemAdded($event)"
+    (commentAdded)="onCommentAdded($event)" (closed)="closeDetail()">
+  </app-modal-detalle-tarjeta>
+  }
+
+  <!-- MODAL: AJUSTES Y MIEMBROS -->
+  @if (showSettingsModal()) {
+  <app-modal-ajustes-tablero [board]="board()" [tags]="tags()" [isAdmin]="isAdmin()"
+    (boardChanged)="loadBoard(board().id)" (closed)="showSettingsModal.set(false)">
+  </app-modal-ajustes-tablero>
+  }
+
+  <!-- MODAL: PERFIL Y CONFIGURACIÓN -->
+  @if (showProfileModal()) {
+    <app-modal-perfil (closed)="showProfileModal.set(false)"></app-modal-perfil>
+  }
+
+  <!-- BOARD CHAT PANEL -->
+  @if (showChat()) {
+    <app-board-chat [boardId]="board().id" [socket]="socket" (close)="showChat.set(false)"></app-board-chat>
+  }
+
+</div>
+} @else {
+<div class="loading-state">
+  <div class="spinner"></div>
+  Cargando tablero...
+</div>
+}

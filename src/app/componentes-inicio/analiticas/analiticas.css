@@ -1,0 +1,118 @@
+:host {
+  display: block;
+  flex: 1;
+}
+
+.analiticas-viewport {
+  padding: 24px 28px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.analiticas-header {
+  margin-bottom: 28px;
+}
+
+.title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: -0.03em;
+  color: var(--t1);
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 0.85rem;
+  color: var(--t3);
+  font-weight: 500;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--bd);
+  border-radius: var(--r-xl);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--sh-sm);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sh-md);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--r-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon svg { width: 22px; height: 22px; stroke-width: 2.2; }
+.stat-icon.blue { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+.stat-icon.purple { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; }
+.stat-icon.amber { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+
+.stat-info { display: flex; flex-direction: column; }
+.stat-val { font-size: 1.6rem; font-weight: 800; color: var(--t1); font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.1; }
+.stat-label { font-size: 0.85rem; color: var(--t3); font-weight: 500; margin-top: 2px; }
+
+.line-chart-container { margin-bottom: 24px; }
+.full-width { grid-column: 1 / -1; }
+.chart-wrapper.line { height: 250px; }
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+}
+
+.chart-card {
+  background: var(--surface);
+  border: 1px solid var(--bd);
+  border-radius: var(--r-xl);
+  padding: 24px;
+  box-shadow: var(--sh-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--t1);
+  margin-bottom: 24px;
+  letter-spacing: -0.01em;
+}
+
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.chart-wrapper.doughnut {
+  height: 250px;
+}
+
+.chart-wrapper.bar {
+  height: 250px;
+}

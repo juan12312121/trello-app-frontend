@@ -1,0 +1,37 @@
+<!-- actividad-reciente.component.html -->
+<div class="panel">
+  <div class="panel-hdr">
+    <span class="panel-title">Actividad reciente</span>
+    <a href="javascript:void(0)" class="panel-link" (click)="seeAll.emit()">Ver todo</a>
+  </div>
+  <div class="panel-body" id="activityFeed">
+    
+    @if (actividades().length === 0) {
+      <div style="padding: 1rem; color: var(--txt-muted); font-size: 0.9rem; text-align: center;">
+        No hay actividad reciente en tus tableros.
+      </div>
+    }
+    
+    @for (a of paginatedActividades(); track a.id) {
+    <div class="activity-item">
+      <div class="act-av">{{ a.usuario_nombre?.charAt(0) | uppercase }}</div>
+      <div>
+        <div class="act-text">
+          <strong>{{ a.usuario_nombre }}</strong> {{ a.descripcion }}
+          <span class="act-board">en {{ a.board_nombre }}</span>
+        </div>
+        <div class="act-time">{{ a.fecha_creacion | date:'short' }}</div>
+      </div>
+    </div>
+    }
+
+    @if (actividades().length > 0) {
+      <div class="pagination-controls">
+        <button [disabled]="currentPage() === 1" (click)="prevPage()" class="btn-page">Anterior</button>
+        <span class="page-info">Página {{ currentPage() }} de {{ totalPages() }}</span>
+        <button [disabled]="currentPage() === totalPages()" (click)="nextPage()" class="btn-page">Siguiente</button>
+      </div>
+    }
+
+  </div>
+</div>

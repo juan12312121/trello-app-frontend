@@ -1,0 +1,71 @@
+<!-- inicio.component.html -->
+<div class="dashboard-wrapper">
+
+  <!-- Sidebar -->
+  <app-aside-inicio 
+    (openProfile)="showProfileModal.set(true)"
+    (viewChanged)="activeView.set($event)">
+  </app-aside-inicio>
+
+  <!-- Main content -->
+  <main class="main">
+
+    <!-- Topbar -->
+    <app-header-inicio></app-header-inicio>
+
+    <!-- Page body -->
+    <div class="page-body">
+
+      <div style="padding: 24px 28px 0;">
+        <app-invitaciones-pendientes></app-invitaciones-pendientes>
+      </div>
+
+      @if (activeView() === 'boards') {
+        <app-vista-tableros></app-vista-tableros>
+      } @else if (activeView() === 'tasks') {
+        <app-lista-tareas-asignadas></app-lista-tareas-asignadas>
+      } @else if (activeView() === 'reminders') {
+        <div style="flex:1; display:flex; flex-direction:column;">
+          <app-pendientes></app-pendientes>
+        </div>
+      } @else if (activeView() === 'activity') {
+        <div style="flex:1; display:flex; flex-direction:column;">
+          <app-actividad-reciente></app-actividad-reciente>
+        </div>
+      } @else if (activeView() === 'analytics') {
+        <app-analiticas [activities]="activities()" [pendientes]="pendientes()"></app-analiticas>
+      }
+
+      @if (activeView() === 'boards' || activeView() === 'tasks') {
+        <!-- Bottom grid: Tasks & Activity -->
+        <div class="bottom-grid">
+          <app-pendientes (seeAll)="activeView.set('reminders')"></app-pendientes>
+          <app-actividad-reciente (seeAll)="activeView.set('activity')"></app-actividad-reciente>
+        </div>
+      }
+
+    </div>
+  </main>
+
+  <!-- MODAL: PERFIL Y CONFIGURACIÓN -->
+  @if (showProfileModal()) {
+    <app-modal-perfil (closed)="showProfileModal.set(false)"></app-modal-perfil>
+  }
+
+  <!-- MODAL GLOBAL: CREAR TABLERO (atajos: C) -->
+  @if (showCreateBoard()) {
+    <app-modal-crear-tablero
+      (close)="showCreateBoard.set(false)"
+      (created)="showCreateBoard.set(false)">
+    </app-modal-crear-tablero>
+  }
+
+  <!-- HOTKEY TOOLTIP OVERLAY -->
+  <div class="hotkey-hint">
+    <span><kbd>C</kbd> Nuevo tablero</span>
+    <span><kbd>/</kbd> Buscar</span>
+    <span><kbd>T</kbd> Tema</span>
+    <span><kbd>Esc</kbd> Cerrar</span>
+  </div>
+
+</div>

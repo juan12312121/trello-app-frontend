@@ -1,0 +1,26 @@
+<section id="how" class="how-section">
+  <div class="section-header">
+    <h2>Comienza en 3 pasos</h2>
+    <p>Tan fácil como 1, 2, 3</p>
+  </div>
+
+  <div class="steps-row">
+    @for (step of steps; track step.number; let last = $last) {
+      <div class="step">
+        <div class="step-circle">
+          <!-- span en lugar de mat-icon -->
+          <span class="material-icons">{{ step.icon }}</span>
+        </div>
+        <div class="step-num">Paso {{ step.number }}</div>
+        <h3>{{ step.title }}</h3>
+        <p>{{ step.description }}</p>
+      </div>
+
+      @if (!last) {
+        <div class="step-arrow">
+          <span class="material-icons">arrow_forward</span>
+        </div>
+      }
+    }
+  </div>
+</section>

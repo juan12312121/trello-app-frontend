@@ -1,0 +1,74 @@
+<!-- aside-inicio.component.html -->
+<aside class="sidebar">
+  <a routerLink="/dashboard" class="sidebar-brand">
+    <span class="brand-logo">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+    </span>
+    <span class="brand-name">TaskFlow</span>
+  </a>
+
+  <div class="sidebar-scroll">
+    <nav>
+      <div class="nav-group">
+        <div class="nav-label">Principal</div>
+        <button class="nav-link" [class.active]="activeItem() === 'boards'" (click)="goToDashboard()">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          Mis tableros
+        </button>
+        <button class="nav-link" [class.active]="activeItem() === 'tasks'" (click)="showTasks()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          Tareas asignadas
+        </button>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">Dashboard</div>
+        <button class="nav-link" [class.active]="activeItem() === 'analytics'" (click)="showAnalytics()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+          Analíticas
+        </button>
+        <button class="nav-link" [class.active]="activeItem() === 'reminders'" (click)="showReminders()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/></svg>
+          Pendientes
+        </button>
+        <button class="nav-link" [class.active]="activeItem() === 'activity'" (click)="showActivity()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Actividad
+        </button>
+      </div>
+
+
+      <div class="nav-group">
+        <div class="nav-label">Tableros recientes</div>
+        @for (b of (boardService.boards() || []).slice(0, 3); track b.id) {
+          <button class="nav-link" (click)="router.navigate(['/board', b.id])">
+             <span class="nav-dot" [ngClass]="b.portada || 'c-blue'"></span>
+            {{ b.nombre }}
+          </button>
+        }
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">Cuenta</div>
+        <button class="nav-link" (click)="openProfile.emit()">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          Mi perfil
+        </button>
+        <button class="nav-link" (click)="handleLogout()">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          Cerrar sesión
+        </button>
+      </div>
+    </nav>
+  </div>
+
+  <div class="sidebar-footer" *ngIf="authService.currentUser() as user" (click)="openProfile.emit()" style="cursor:pointer">
+    <div class="user-card">
+      <div class="avatar">{{ user.nombre.charAt(0) | uppercase }}</div>
+      <div class="user-info">
+        <div class="user-name">{{ user.nombre }}</div>
+        <div class="user-role">{{ user.email }}</div>
+      </div>
+    </div>
+  </div>
+</aside>

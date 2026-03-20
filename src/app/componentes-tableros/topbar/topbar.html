@@ -1,0 +1,155 @@
+<header class="topbar">
+
+  <button class="tb-back" (click)="goBack()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+    Tableros
+  </button>
+
+  <div class="tb-sep"></div>
+
+  <input
+    class="board-title-input"
+    [value]="board().nombre"
+    spellcheck="false"
+    [readonly]="!canEdit()"
+    (change)="canEdit() ? boardRenamed.emit($any($event.target).value) : null">
+
+  <div class="tb-sep"></div>
+
+  <div class="tb-acts">
+    <!-- Stack de avatares -->
+    <div class="m-stack">
+      @for (m of board().miembros; track m.id) {
+        <div class="m-av" [style.background]="m.color" [title]="m.nombre">
+          {{ m.initials }}
+        </div>
+      }
+    </div>
+    
+    @if (isAdmin()) {
+      <div class="m-av m-av-add" title="Invitar" (click)="openInvite.emit()">+</div>
+    }
+
+    <div class="tb-sep"></div>
+
+    <button class="btn-icon" title="Filtrar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+      </svg>
+    </button>
+    <!-- Theme Selector Dropdown -->
+    <div class="theme-dropdown-wrap">
+      <button class="btn-theme-selector" (click)="showThemeMenu.set(!showThemeMenu())">
+        <div class="current-dot"></div>
+        Tema
+      </button>
+
+      @if (showThemeMenu()) {
+        <div class="theme-menu" (click)="showThemeMenu.set(false)">
+          <button class="theme-item light" (click)="themeService.setTheme('light')" [class.active]="themeService.currentTheme() === 'light'">
+            <i></i> Claro
+          </button>
+          <button class="theme-item dark" (click)="themeService.setTheme('dark')" [class.active]="themeService.currentTheme() === 'dark'">
+            <i></i> Oscuro
+          </button>
+          <button class="theme-item purple" (click)="themeService.setTheme('purple')" [class.active]="themeService.currentTheme() === 'purple'">
+            <i></i> Ametista
+          </button>
+          <button class="theme-item emerald" (click)="themeService.setTheme('emerald')" [class.active]="themeService.currentTheme() === 'emerald'">
+            <i></i> Esmeralda
+          </button>
+          <button class="theme-item rose" (click)="themeService.setTheme('rose')" [class.active]="themeService.currentTheme() === 'rose'">
+            <i></i> Sakura
+          </button>
+          <button class="theme-item ocean" (click)="themeService.setTheme('ocean')" [class.active]="themeService.currentTheme() === 'ocean'">
+            <i></i> Océano
+          </button>
+          <button class="theme-item sunset" (click)="themeService.setTheme('sunset')" [class.active]="themeService.currentTheme() === 'sunset'">
+            <i></i> Atardecer
+          </button>
+          <button class="theme-item forest" (click)="themeService.setTheme('forest')" [class.active]="themeService.currentTheme() === 'forest'">
+            <i></i> Bosque
+          </button>
+        </div>
+      }
+    </div>
+
+    <button class="btn-icon" title="Buscar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.35-4.35" />
+      </svg>
+    </button>
+
+    <!-- Campana de Notificaciones -->
+    <div class="tb-notif-wrap">
+      <button class="btn-icon" [class.has-notifs]="pendingReminders().length > 0" title="Notificaciones"
+        (click)="toggleNotifs()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+          <path d="M13.73 21a2 2 0 01-3.46 0" />
+        </svg>
+        <span class="notif-badge" *ngIf="pendingReminders().length > 0">
+          {{ pendingReminders().length }}
+        </span>
+      </button>
+
+      @if (showNotifs()) {
+      <div class="notif-dropdown">
+        <div class="nd-hdr">Notificaciones</div>
+        <div class="nd-body">
+          @if (pendingReminders().length === 0) {
+          <div class="nd-empty">No hay recordatorios pendientes</div>
+          } @else {
+          @for (rem of pendingReminders(); track rem.id) {
+          <div class="nd-item">
+            <div class="nd-item-txt" style="flex:1;">
+              <strong>{{ rem.card_titulo }}</strong>
+              <div class="nd-item-sub">En {{ rem.lista_nombre }} • {{ rem.fecha_recordatorio | date:'short' }}</div>
+            </div>
+            <button class="nd-item-close" title="Descartar" (click)="dismissReminder(rem, $event)">×</button>
+          </div>
+          }
+          }
+        </div>
+      </div>
+      }
+    </div>
+
+    @if (canEdit()) {
+      <button class="btn-sm ghost" (click)="openCreateCard.emit()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Crear tarjeta
+      </button>
+    }
+
+    @if (isAdmin()) {
+      <button class="btn-sm primary" (click)="openInvite.emit()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="18" cy="5" r="3"/>
+          <circle cx="6" cy="12" r="3"/>
+          <circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+        Compartir
+      </button>
+
+      <div class="tb-sep"></div>
+      
+      <!-- Settings Button -->
+      <button class="btn-icon" title="Ajustes" (click)="openSettings.emit()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+    }
+  </div>
+
+</header>

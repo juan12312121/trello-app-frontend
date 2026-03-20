@@ -1,0 +1,43 @@
+<!-- pendientes.component.html -->
+<div class="panel">
+  <div class="panel-hdr">
+    <span class="panel-title">Mis tareas pendientes</span>
+    <a href="javascript:void(0)" class="panel-link" (click)="seeAll.emit()">Ver todas</a>
+  </div>
+  <div class="panel-body" id="taskList">
+
+    @if (tareas().length === 0) {
+      <div style="padding: 1rem; color: var(--txt-muted); font-size: 0.9rem; text-align: center;">
+        No tienes tareas pendientes urgentes.
+      </div>
+    }
+
+    @for (t of paginatedTareas(); track t.id) {
+    <div class="task-row">
+      <div class="task-check" [class.completed]="t.completado">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="task-info">
+        <div class="task-title">{{ t.card_titulo }}</div>
+        <div class="task-meta">
+          <span class="task-type-tag">{{ t.tipo }}</span>
+        </div>
+      </div>
+      @if (t.fecha_recordatorio) {
+        <span class="task-due upcoming">{{ t.fecha_recordatorio | date:'shortDate' }}</span>
+      } @else {
+        <span class="task-due none">—</span>
+      }
+    </div>
+    }
+
+    @if (tareas().length > 0) {
+      <div class="pagination-controls">
+        <button [disabled]="currentPage() === 1" (click)="prevPage()" class="btn-page">Anterior</button>
+        <span class="page-info">Página {{ currentPage() }} de {{ totalPages() }}</span>
+        <button [disabled]="currentPage() === totalPages()" (click)="nextPage()" class="btn-page">Siguiente</button>
+      </div>
+    }
+
+  </div>
+</div>

@@ -1,0 +1,29 @@
+<section class="testimonials-section">
+  <div class="section-header">
+    <h2>Lo que dicen nuestros usuarios</h2>
+    <p>Desde startups hasta empresas Fortune 500</p>
+  </div>
+
+  <div class="testimonials-grid">
+    @for (review of reviews; track review.name) {
+      <div class="review-card">
+
+        <div class="review-body">
+          <div class="stars">★★★★★</div>
+          <p class="review-text">{{ review.text }}</p>
+        </div>
+
+        <div class="review-footer">
+          <div class="avatar" [style.background]="review.color">
+            {{ review.initials }}
+          </div>
+          <div class="author-info">
+            <div class="author-name">{{ review.name }}</div>
+            <div class="author-role">{{ review.role }}</div>
+          </div>
+        </div>
+
+      </div>
+    }
+  </div>
+</section>

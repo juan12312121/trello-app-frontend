@@ -1,0 +1,38 @@
+<section id="pricing" class="pricing-section">
+  <div class="section-header">
+    <h2>Planes para cada equipo</h2>
+    <p>Elige el plan perfecto, desde startups hasta empresas grandes</p>
+  </div>
+
+  <div class="pricing-grid">
+    @for (plan of plans; track plan.name) {
+      <div class="plan-card" [class.featured]="plan.featured">
+
+        <div class="plan-header">
+          <span class="badge" [class.badge-featured]="plan.featured">
+            {{ plan.badge }}
+          </span>
+          <div class="plan-name">{{ plan.name }}</div>
+          <div class="plan-price">{{ plan.price }}</div>
+          <div class="plan-period">{{ plan.period }}</div>
+        </div>
+
+        <ul class="plan-features">
+          @for (feat of plan.features; track feat) {
+            <li>
+              <span class="material-icons check-icon">check_circle</span>
+              {{ feat }}
+            </li>
+          }
+        </ul>
+
+        <div class="plan-footer">
+          <a [routerLink]="plan.link" class="plan-btn" [class.btn-primary]="plan.featured" [class.btn-outline]="!plan.featured">
+            {{ plan.cta }}
+          </a>
+        </div>
+
+      </div>
+    }
+  </div>
+</section>

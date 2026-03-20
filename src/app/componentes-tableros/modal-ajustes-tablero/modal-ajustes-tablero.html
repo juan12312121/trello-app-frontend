@@ -1,0 +1,117 @@
+<div class="overlay-modal" (click)="closed.emit()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    
+    <div class="mb-hdr">
+      <h2>Ajustes y Componentes</h2>
+      <button class="mb-close" (click)="closed.emit()">×</button>
+    </div>
+
+    <div class="mb-body">
+      <!-- Tabs Sidebar -->
+      <div class="aside-tabs">
+        <button [class.active]="activeTab() === 'general'" (click)="activeTab.set('general')">Información General</button>
+        <button [class.active]="activeTab() === 'members'" (click)="activeTab.set('members')">Miembros</button>
+        <button [class.active]="activeTab() === 'tags'" (click)="activeTab.set('tags')">Etiquetas</button>
+      </div>
+
+      <!-- Content Area -->
+      <div class="content-panel">
+
+        <!-- GENERAL -->
+        @if (activeTab() === 'general') {
+          <h3 class="panel-title">Ajustes del Tablero</h3>
+          <p class="panel-desc">Gestiona opciones críticas del tablero actual.</p>
+          
+          <div class="settings-group">
+            <div class="set-row">
+              <div class="set-info">
+                <strong>Archivar tablero</strong>
+                <span>Ocultará el tablero pero se puede recuperar después.</span>
+              </div>
+              <button class="btn-warn" [disabled]="!isAdmin()" (click)="archiveBoard()">Archivar</button>
+            </div>
+            
+            <div class="set-row">
+              <div class="set-info">
+                <strong>Eliminar definitivamente</strong>
+                <span class="danger-txt">No reversible. Todas las tarjetas serán eliminadas.</span>
+              </div>
+              <button class="btn-danger" [disabled]="!isAdmin()" (click)="deleteBoard()">Eliminar</button>
+            </div>
+          </div>
+          @if (!isAdmin()) {
+            <p style="color:red; font-size:12px; margin-top:20px;">Solo el dueño o administrador del tablero puede modificar estos ajustes.</p>
+          }
+        }
+
+        <!-- MIEMBROS -->
+        @if (activeTab() === 'members') {
+          <h3 class="panel-title">Miembros del Tablero</h3>
+          
+          <div class="mem-list">
+            @for (mem of board().miembros; track mem.id) {
+              <div class="mem-item">
+                <div class="c-av" [style.background]="mem.color" [title]="mem.email">
+                  {{ mem.initials }}
+                </div>
+                <div class="mem-data">
+                  <strong>{{ mem.nombre }}</strong>
+                  <span>{{ mem.email }}</span>
+                </div>
+                
+                @if (isAdmin() && mem.id !== board().usuario_propietario_id) {
+                  <select class="role-sel" [value]="mem.rol" (change)="changeRole(mem.id, $any($event.target).value)">
+                    <option value="admin">Admin</option>
+                    <option value="editor">Editor</option>
+                    <option value="comentador">Comentador</option>
+                    <option value="viewer">Lector</option>
+                  </select>
+                  
+                  <button class="btn-remove" (click)="removeMember(mem.id)">Expulsar</button>
+                } @else {
+                  <span class="role-badge">{{ mem.rol }}</span>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <!-- ETIQUETAS -->
+        @if (activeTab() === 'tags') {
+          <h3 class="panel-title">Gestionar Etiquetas</h3>
+          <p class="panel-desc">Crea etiquetas para categorizar las tarjetas. Ej: "Bug", "Prioridad", etc.</p>
+
+          <div class="tags-mng-box" *ngIf="isAdmin() || board().usuario_propietario_id"> <!-- Simplificar validacion para editores tb -->
+            <div class="tag-form">
+              <input type="text" placeholder="Nombre (e.g. Frontend)" class="tf-input"
+                     [value]="newTagNombre()" (input)="newTagNombre.set($any($event.target).value)">
+              <input type="color" class="tf-color" 
+                     [value]="newTagColor()" (input)="newTagColor.set($any($event.target).value)">
+              <button class="btn-save-tag" [disabled]="!newTagNombre()" (click)="saveTag()">
+                {{ editingTagId() ? 'Actualizar' : 'Crear' }}
+              </button>
+              <button *ngIf="editingTagId()" class="btn-cancel" (click)="resetTagForm()">Cancelar</button>
+            </div>
+          </div>
+
+          <div class="existing-tags">
+            @for (tag of tags(); track tag.id) {
+              <div class="ex-tag-row">
+                <span class="tag-pill" [style.background]="tag.color" [style.color]="'white'">{{ tag.nombre }}</span>
+                
+                <div class="tag-acts">
+                  <button (click)="editTag(tag)" class="btn-mini edit">✏️</button>
+                  <button (click)="deleteTag(tag.id)" class="btn-mini del">❌</button>
+                </div>
+              </div>
+            }
+            @if (tags().length === 0) {
+              <div class="no-data">No has creado etiquetas todavía.</div>
+            }
+          </div>
+        }
+
+      </div>
+    </div>
+  </div>
+</div>

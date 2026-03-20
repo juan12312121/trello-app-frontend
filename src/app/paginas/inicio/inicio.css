@@ -1,0 +1,126 @@
+:host {
+  display: block;
+  background: var(--bg);
+  color: var(--t1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.dashboard-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg);
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* Main content area */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* Page body - scrollable content */
+.page-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Bottom grid: Tasks & Activity */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
+  padding: 0 28px 28px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  /* Sidebar will handle its own hide via its media query */
+}
+
+@media (max-width: 700px) {
+  .page-body {
+    padding: 0;
+  }
+
+  .bottom-grid {
+    grid-template-columns: 1fr;
+    padding: 0 16px 16px;
+  }
+}
+
+/* Global scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Keyboard shortcuts hint bar */
+.hotkey-hint {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 8px 18px;
+  background: var(--surface);
+  border: 1px solid var(--bd);
+  border-radius: var(--r-full);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 40;
+  pointer-events: none;
+  font-size: 0.75rem;
+  color: var(--t3);
+  white-space: nowrap;
+}
+
+.hotkey-hint:hover { opacity: 1; }
+
+.dashboard-wrapper:hover .hotkey-hint {
+  opacity: 0.7;
+}
+
+.hotkey-hint kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 7px;
+  background: var(--s2);
+  border: 1px solid var(--bd);
+  border-radius: 5px;
+  font-family: monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--t1);
+  margin-right: 3px;
+}
