@@ -15,7 +15,12 @@
 
   <!-- Board banner -->
   <div class="sb-banner">
-    <div class="sb-stripe" [ngClass]="board().portada"></div>
+    <div class="sb-stripe" 
+      [ngClass]="!isImage(board().portada) ? (board().portada || 'c-blue') : ''"
+      [style.backgroundImage]="isImage(board().portada) ? normalizeUrl(board().portada) : ''"
+      [style.backgroundSize]="'cover'"
+      [style.backgroundPosition]="'center'">
+    </div>
     <div class="sb-banner-body">
       <div class="sb-banner-name">{{ board().nombre }}</div>
       <div class="sb-stats">

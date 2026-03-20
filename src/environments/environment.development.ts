@@ -1,4 +1,5 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000/api/v1'
+  apiUrl: 'https://trello-app-backend-1.onrender.com/api/v1',
+  serverUrl: 'https://trello-app-backend-1.onrender.com'
 };

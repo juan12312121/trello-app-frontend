@@ -719,8 +719,18 @@ export class TablerosComponent implements OnInit, OnDestroy {
     });
   }
 
-  isImage(p: string | null): boolean {
+  isImage(p: string | undefined | null): boolean {
     return !!p?.startsWith('url');
+  }
+
+  normalizeUrl(url: string | undefined | null): string {
+    if (!url) return '';
+    // Si contiene localhost y estamos en producción (o queremos forzar la ruta de Render)
+    // lo reemplazamos por la URL del servidor actual.
+    if (url.includes('localhost:3000')) {
+      return url.replace('http://localhost:3000', environment.serverUrl);
+    }
+    return url;
   }
 
   handleLogout() {

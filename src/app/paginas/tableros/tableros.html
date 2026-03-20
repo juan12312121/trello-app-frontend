@@ -1,7 +1,7 @@
 @if (board()) {
 <div class="app-shell" [class.focus-mode]="focusMode()"
   [ngClass]="!isImage(board().portada) ? (board().portada || 'c-blue') : ''"
-  [style.backgroundImage]="isImage(board().portada) ? board().portada : ''" [style.backgroundSize]="'cover'"
+  [style.backgroundImage]="isImage(board().portada) ? normalizeUrl(board().portada) : ''" [style.backgroundSize]="'cover'"
   [style.backgroundPosition]="'center'">
 
   <!-- SIDEBAR -->

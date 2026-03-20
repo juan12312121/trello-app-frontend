@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Board, Lista, Tarjeta, Tag } from '../../core/models';
 import { AuthService } from '../../core/services/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-sidebar',
@@ -57,5 +58,17 @@ export class SidebarComponent {
       if (file) this.backgroundChanged.emit(file);
     };
     input.click();
+  }
+
+  isImage(p: string | undefined | null): boolean {
+    return !!p?.startsWith('url');
+  }
+
+  normalizeUrl(url: string | undefined | null): string {
+    if (!url) return '';
+    if (url.includes('localhost:3000')) {
+      return url.replace('http://localhost:3000', environment.apiUrl.replace('/api/v1', ''));
+    }
+    return url;
   }
 }
