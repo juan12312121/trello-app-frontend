@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal, computed, output } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { BoardService } from '../../core/services/board.service';
 import { ActivityService } from '../../core/services/activity.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-actividad-reciente',
@@ -13,9 +14,14 @@ import { ActivityService } from '../../core/services/activity.service';
 export class ActividadReciente implements OnInit {
   private boardService = inject(BoardService);
   private activityService = inject(ActivityService);
+  private router = inject(Router);
   
   actividades = signal<any[]>([]);
   seeAll = output<void>();
+
+  goToBoard(token: string) {
+    this.router.navigate(['/board', token]);
+  }
 
   // Pagination signals
   currentPage = signal(1);

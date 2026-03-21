@@ -9,6 +9,7 @@ import { ReminderService } from '../../core/services/reminder.service';
 import { ChecklistService } from '../../core/services/checklist.service';
 import { BoardService } from '../../core/services/board.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { getInitials, fmtDate, fmtTime } from '../../core/utils/functions';
 
 export interface CardMovedPayload  { cardId: number; targetListId: number; }
 export interface CardUpdatedPayload { 
@@ -18,11 +19,16 @@ export interface CardUpdatedPayload {
   prioridad?: 'baja' | 'media' | 'alta';
   usuario_asignado_id?: number | null;
   fecha_vencimiento?: string | null;
+  tiempo_estimado?: number;
+  tiempo_dedicado?: number;
+  completada?: boolean;
 }
 export interface ChecklistTogglePayload { cardId: number; checklistId: number; itemId: number; }
 export interface ChecklistAddPayload    { cardId: number; checklistId: number; texto: string; }
 export interface CommentAddPayload      { cardId: number; texto: string; }
 export interface ReminderAddPayload     { cardId: number; fecha: string; texto: string; }
+
+import { BaseModalComponent } from '../../core/classes/base-modal.component';
 
 @Component({
   selector: 'app-modal-detalle-tarjeta',
@@ -31,7 +37,7 @@ export interface ReminderAddPayload     { cardId: number; fecha: string; texto: 
   templateUrl: './modal-detalle-tarjeta.html',
   styleUrl: './modal-detalle-tarjeta.css',
 })
-export class ModalDetalleTarjetaComponent implements OnInit {
+export class ModalDetalleTarjetaComponent extends BaseModalComponent implements OnInit {
   card    = input.required<Tarjeta>();
   list    = input.required<Lista>();
   lists   = input.required<Lista[]>();
@@ -41,7 +47,7 @@ export class ModalDetalleTarjetaComponent implements OnInit {
   canEdit = input<boolean>(false);
   canComment = input<boolean>(false);
   boardId = input.required<number>();
-
+  
   cardUpdated      = output<CardUpdatedPayload>();
   cardMoved        = output<CardMovedPayload>();
   cardDeleted      = output<number>();
@@ -52,7 +58,6 @@ export class ModalDetalleTarjetaComponent implements OnInit {
   commentAdded     = output<CommentAddPayload>();
   reminderAdded    = output<ReminderAddPayload>();
   attachmentAdded  = output<File>();
-  closed           = output<void>();
 
   public authService = inject(AuthService);
   private attachmentService = inject(AttachmentService);
@@ -60,6 +65,8 @@ export class ModalDetalleTarjetaComponent implements OnInit {
   private checklistService  = inject(ChecklistService);
   private boardService      = inject(BoardService);
   private notifService      = inject(NotificationService);
+
+  protected Math = Math;
 
   attachments = signal<any[]>([]);
   reminders   = signal<any[]>([]);
@@ -94,10 +101,9 @@ export class ModalDetalleTarjetaComponent implements OnInit {
 
   ngOnInit() { }
 
-  getInitials(name: string | undefined): string {
-    if (!name) return '?';
-    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-  }
+  public getInitials = getInitials;
+  public fmtDate     = fmtDate;
+  public fmtTime     = fmtTime;
 
   commentColor(name: string | undefined): string {
     if (!name) return '#cbd5e1';
@@ -106,34 +112,8 @@ export class ModalDetalleTarjetaComponent implements OnInit {
     for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
     return colors[Math.abs(hash) % colors.length];
   }
-
   getMember(id: number | null) { return this.members().find(m => m.id === id) ?? null; }
   getTag(id: number)           { return this.tags().find(t => t.id === id) ?? null; }
-
-  fmtDate(d: any): string {
-    if (!d) return 'Sin fecha';
-    try {
-      const date = new Date(d);
-      if (typeof d === 'string' && d.length === 10 && d.includes('-')) {
-        date.setHours(12, 0, 0, 0);
-      }
-      if (isNaN(date.getTime())) return '—';
-      return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
-    } catch {
-      return '—';
-    }
-  }
-
-  fmtTime(d: any): string {
-    if (!d) return '—';
-    try {
-      const date = new Date(d);
-      if (isNaN(date.getTime())) return '—';
-      return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-    } catch {
-      return '—';
-    }
-  }
 
   dueClass(d: string | null): string {
     const t = this.today();

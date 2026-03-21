@@ -1,11 +1,11 @@
 @if (board()) {
-<div class="app-shell" [class.focus-mode]="focusMode()" [class.sidebar-open]="isSidebarOpen()"
+<div class="app-shell" [class.focus-mode]="ui.focusMode()" [class.sidebar-open]="ui.isSidebarOpen()"
   [ngClass]="!isImage(board().portada) ? (board().portada || 'c-blue') : ''"
   [style.backgroundImage]="isImage(board().portada) ? normalizeUrl(board().portada) : ''" [style.backgroundSize]="'cover'"
   [style.backgroundPosition]="'center'">
 
-  @if (isSidebarOpen()) {
-    <div class="sidebar-overlay" (click)="isSidebarOpen.set(false)"></div>
+  @if (ui.isSidebarOpen()) {
+    <div class="sidebar-overlay" (click)="ui.isSidebarOpen.set(false)"></div>
   }
 
   <!-- SIDEBAR -->
@@ -15,8 +15,8 @@
     [overdueCount]="overdueCount" [myTasksCount]="myTasksCount" [archivedCount]="archivedCount"
     [attachmentsCount]="attachmentsCount" [activeView]="viewMode()" [activeFilter]="filterBy()"
     (viewChanged)="onViewChanged($event)" (filterChanged)="onFilterChanged($event)" (logout)="handleLogout()"
-    (openInvite)="showInviteModal.set(true)" (openSettings)="showSettingsModal.set(true)"
-    (openProfile)="showProfileModal.set(true)" (backgroundChanged)="onBackgroundChanged($event)">
+    (openInvite)="ui.showInvite.set(true)" (openSettings)="ui.showSettings.set(true)"
+    (openProfile)="ui.showProfile.set(true)" (backgroundChanged)="onBackgroundChanged($event)">
   </app-sidebar>
 
   <!-- MAIN -->
@@ -24,12 +24,12 @@
 
     <!-- TOPBAR (incluye cover-stripe) -->
     <app-topbar [board]="board()" [isAdmin]="isAdmin()" [canEdit]="canEdit()" (openInvite)="openInvite()"
-      (openCreateCard)="openCreateCard(null)" (openSettings)="showSettingsModal.set(true)"
+      (openCreateCard)="openCreateCard(null)" (openSettings)="ui.showSettings.set(true)"
       (boardRenamed)="board().nombre = $event" (toggleSidebar)="toggleSidebar()">
     </app-topbar>
 
     <!-- CHAT TOGGLE BUTTON -->
-    <button class="chat-toggle-btn" (click)="toggleChat()" [class.active]="showChat()" title="Chat del proyecto (G)">
+    <button class="chat-toggle-btn" (click)="toggleChat()" [class.active]="ui.showChat()" title="Chat del proyecto (G)">
       <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     </button>
 
@@ -162,37 +162,102 @@
         }
       </div>
     </div>
+    } @else if (viewMode() === 'analytics') {
+    <div class="analytics-view-container">
+      <div class="analytics-header">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <h2>📊 Reportes y Analíticas</h2>
+            <p>Visión general del progreso y carga de trabajo del equipo.</p>
+          </div>
+          <button class="btn-move" (click)="exportToCSV()" style="padding: 10px 20px; font-weight: 700;">
+            📥 Exportar CSV
+          </button>
+        </div>
+      </div>
+
+      <div class="analytics-grid">
+        <!-- Analytics Summary -->
+        <div class="stats-card">
+          <span class="sc-label">Total Tarjetas</span>
+          <span class="sc-value">{{ allCards().length }}</span>
+        </div>
+        <div class="stats-card">
+          <span class="sc-label">Completadas</span>
+          <span class="sc-value">{{ totalCompletedCards() }}</span>
+        </div>
+        <div class="stats-card">
+          <span class="sc-label">Tiempo Estimado</span>
+          <span class="sc-value">{{ analyticsData().totalEstimated }}h</span>
+        </div>
+        <div class="stats-card">
+          <span class="sc-label">Tiempo Real</span>
+          <span class="sc-value">{{ analyticsData().totalDedicated }}h</span>
+        </div>
+      </div>
+
+      <!-- Gráficos de Distribución -->
+      <div class="charts-row">
+        <div class="chart-box">
+          <h3>Distribución por Lista</h3>
+          <div class="bar-chart">
+            @for (item of analyticsData().distribution; track item.name) {
+              <div class="bar-row">
+                <span class="bar-label">{{ item.name }}</span>
+                <div class="bar-track">
+                  <div class="bar-fill" [style.width.%]="(item.count / (allCards().length || 1)) * 100" [title]="item.count + ' tarjetas'"></div>
+                </div>
+                <span class="bar-count">{{ item.count }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="chart-box">
+          <h3>Productividad por Miembro</h3>
+          <div class="member-list-stats">
+            @for (m of analyticsData().memberStats; track m.name) {
+              <div class="member-stat-row">
+                <span class="ms-name">{{ m.name }}</span>
+                <span class="ms-data"><b>{{ m.completed }}/{{ m.total }}</b> tareas</span>
+                <span class="ms-time">⏱ {{ m.time }}h registradas</span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
     }
   </div>
 
   <!-- FOCUS MODE EXIT BADGE -->
-  @if (focusMode()) {
-    <button class="focus-exit-btn" (click)="focusMode.set(false)" title="Salir del modo enfoque (F o Esc)">
+  @if (ui.focusMode()) {
+    <button class="focus-exit-btn" (click)="ui.focusMode.set(false)" title="Salir del modo enfoque (F o Esc)">
       <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
       Salir del Modo Enfoque
     </button>
   }
 
   <!-- CONTEXT MENU -->
-  <app-context-menu [open]="ctxOpen()" [x]="ctxX" [y]="ctxY" [isArchived]="ctxIsArchived()"
+  <app-context-menu *ngIf="ui.ctx.open()" [x]="ui.ctx.x" [y]="ui.ctx.y" [isArchived]="ui.ctx.isArchived()"
     (action)="ctxAction($event)" (closed)="closeCtx()">
   </app-context-menu>
 
   <!-- MODAL: INVITAR MIEMBRO -->
-  @if (showInviteModal()) {
+  @if (ui.showInvite()) {
   <app-modal-invitar (memberInvited)="onMemberInvited($event)" (closed)="closeInvite()">
   </app-modal-invitar>
   }
 
   <!-- MODAL: CREAR TARJETA -->
-  @if (showCreateCardModal()) {
+  @if (ui.showCreateCard()) {
   <app-modal-crear-tarjeta [lists]="activeLists()" [tags]="tags()" [members]="board().miembros || []"
     [defaultListId]="createCardTargetListId()" (cardCreated)="onCardCreated($event)" (closed)="closeCreateCard()">
   </app-modal-crear-tarjeta>
   }
 
   <!-- MODAL: DETALLE TARJETA -->
-  @if (showDetailModal() && activeCardDetail()) {
+  @if (ui.showDetail() && activeCardDetail()) {
   <app-modal-detalle-tarjeta [card]="activeCardDetail()!.card" [list]="activeCardDetail()!.list" [lists]="activeLists()"
     [tags]="tags()" [members]="board().miembros || []" [today]="today" [canEdit]="canEdit()" [canComment]="canComment()"
     [boardId]="board().id" (cardUpdated)="onCardUpdated($event)" (cardMoved)="onCardMoved($event)"
@@ -203,20 +268,20 @@
   }
 
   <!-- MODAL: AJUSTES Y MIEMBROS -->
-  @if (showSettingsModal()) {
+  @if (ui.showSettings()) {
   <app-modal-ajustes-tablero [board]="board()" [tags]="tags()" [isAdmin]="isAdmin()"
-    (boardChanged)="loadBoard(board().id)" (closed)="showSettingsModal.set(false)">
+    (boardChanged)="loadBoard(board().id)" (closed)="ui.showSettings.set(false)">
   </app-modal-ajustes-tablero>
   }
 
   <!-- MODAL: PERFIL Y CONFIGURACIÓN -->
-  @if (showProfileModal()) {
-    <app-modal-perfil (closed)="showProfileModal.set(false)"></app-modal-perfil>
+  @if (ui.showProfile()) {
+    <app-modal-perfil (closed)="ui.showProfile.set(false)"></app-modal-perfil>
   }
 
   <!-- BOARD CHAT PANEL -->
-  @if (showChat()) {
-    <app-board-chat [boardId]="board().id" [socket]="socket" (close)="showChat.set(false)"></app-board-chat>
+  @if (ui.showChat()) {
+    <app-board-chat [boardId]="board().id" [socket]="socket" (close)="ui.showChat.set(false)"></app-board-chat>
   }
 
 </div>

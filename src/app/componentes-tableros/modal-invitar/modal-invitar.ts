@@ -6,6 +6,8 @@ import { NotificationService } from '../../core/services/notification.service';
 export type Rol = 'admin'|'editor'|'comentador'|'viewer';
 export interface InvitePayload { email: string; rol: Rol; }
 
+import { BaseModalComponent } from '../../core/classes/base-modal.component';
+
 @Component({
   selector: 'app-modal-invitar',
   standalone: true,
@@ -13,11 +15,10 @@ export interface InvitePayload { email: string; rol: Rol; }
   templateUrl: './modal-invitar.html',
   styleUrl: './modal-invitar.css',
 })
-export class ModalInvitarComponent {
+export class ModalInvitarComponent extends BaseModalComponent {
   private notifService = inject(NotificationService);
 
   memberInvited = output<InvitePayload>();
-  closed        = output<void>();
 
   email       = signal('');
   selectedRol = signal<Rol>('editor');

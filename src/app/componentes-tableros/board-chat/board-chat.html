@@ -51,9 +51,9 @@
         }
 
         <div class="msg-bubble-wrap">
-          <div class="msg-bubble" [title]="formatTime(msg.timestamp)">
+          <div class="msg-bubble" [title]="fmtTime(msg.timestamp)">
             {{ msg.text }}
-            <span class="bubble-time">{{ formatTime(msg.timestamp) }}</span>
+            <span class="bubble-time">{{ fmtTime(msg.timestamp) }}</span>
           </div>
           
           <!-- REACTION BUTTON -->

@@ -82,6 +82,12 @@
           </svg>
           Calendario
         </button>
+        <button class="nav-link" [class.active]="activeView() === 'analytics'" (click)="viewChanged.emit('analytics')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 20V10M12 20V4M6 20v-6"/>
+          </svg>
+          Analíticas
+        </button>
       </div>
 
       <!-- Etiquetas -->
@@ -194,7 +200,7 @@
       <div class="nav-group">
         <div class="nav-lbl">Mis tableros</div>
         @for (b of otherBoards(); track b.id) {
-          <button class="nav-link" (click)="goToBoard(b.id)">
+          <button class="nav-link" (click)="goToBoard(b)">
             <span class="nav-dot" [style.background]="cmap()[b.portada] || '#94a3b8'"></span>
             {{ b.nombre }}
           </button>

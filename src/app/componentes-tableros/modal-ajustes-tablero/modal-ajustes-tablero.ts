@@ -6,6 +6,9 @@ import { MemberService } from '../../core/services/member.service';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { NotificationService } from '../../core/services/notification.service';
+import { getInitials } from '../../core/utils/functions';
+
+import { BaseModalComponent } from '../../core/classes/base-modal.component';
 
 @Component({
   selector: 'app-modal-ajustes-tablero',
@@ -14,12 +17,11 @@ import { NotificationService } from '../../core/services/notification.service';
   templateUrl: './modal-ajustes-tablero.html',
   styleUrl: './modal-ajustes-tablero.css'
 })
-export class ModalAjustesTableroComponent {
+export class ModalAjustesTableroComponent extends BaseModalComponent {
   board = input.required<any>();
   tags = input.required<any[]>();
   isAdmin = input<boolean>(false);
 
-  closed = output<void>();
   boardChanged = output<void>();
 
   private boardService = inject(BoardService);
@@ -28,17 +30,14 @@ export class ModalAjustesTableroComponent {
   private router = inject(Router);
   private notifService = inject(NotificationService);
 
+  public getInitials = getInitials;
+
   activeTab = signal<'general' | 'members' | 'tags'>('general');
 
   // Tag Form
   newTagNombre = signal('');
   newTagColor = signal('#3b82f6');
   editingTagId = signal<number | null>(null);
-
-  getInitials(name: string | undefined): string {
-    if (!name) return '?';
-    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-  }
 
   // --- GENERAL ---
   async archiveBoard() {

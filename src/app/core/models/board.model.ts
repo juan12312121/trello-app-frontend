@@ -3,6 +3,7 @@ import { Lista } from './lista.model';
 
 export interface Board {
   id: number;
+  token?: string;
   nombre: string;
   descripcion?: string;
   usuario_propietario_id: number;

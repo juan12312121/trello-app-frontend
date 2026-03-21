@@ -1,37 +1,34 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
 import { Lista } from '../models';
+import { BaseService } from './base.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ListService {
-  private http = inject(HttpClient);
-  private readonly apiUrl = environment.apiUrl;
+export class ListService extends BaseService {
 
   getLists(boardId: number): Observable<{success: boolean, data: Lista[]}> {
-    return this.http.get<{success: boolean, data: Lista[]}>(`${this.apiUrl}/boards/${boardId}/lists`);
+    return this.get<{success: boolean, data: Lista[]}>(`/boards/${boardId}/lists`);
   }
 
   createList(boardId: number, list: Partial<Lista>): Observable<{success: boolean, data: Lista}> {
-    return this.http.post<{success: boolean, data: Lista}>(`${this.apiUrl}/boards/${boardId}/lists`, list);
+    return this.post<{success: boolean, data: Lista}>(`/boards/${boardId}/lists`, list);
   }
 
   reorderLists(boardId: number, lists: any[]): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/boards/${boardId}/lists/reorder`, { lists });
+    return this.patch(`/boards/${boardId}/lists/reorder`, { lists });
   }
 
   updateList(boardId: number, listId: number, data: Partial<Lista>): Observable<{success: boolean, data: Lista}> {
-    return this.http.patch<{success: boolean, data: Lista}>(`${this.apiUrl}/boards/${boardId}/lists/${listId}`, data);
+    return this.patch<{success: boolean, data: Lista}>(`/boards/${boardId}/lists/${listId}`, data);
   }
 
   archiveList(boardId: number, listId: number): Observable<{success: boolean}> {
-    return this.http.patch<{success: boolean}>(`${this.apiUrl}/boards/${boardId}/lists/${listId}/archive`, {});
+    return this.patch<{success: boolean}>(`/boards/${boardId}/lists/${listId}/archive`, {});
   }
 
   deleteList(boardId: number, listId: number): Observable<{success: boolean}> {
-    return this.http.delete<{success: boolean}>(`${this.apiUrl}/boards/${boardId}/lists/${listId}`);
+    return this.delete<{success: boolean}>(`/boards/${boardId}/lists/${listId}`);
   }
 }

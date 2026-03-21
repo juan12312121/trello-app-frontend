@@ -9,7 +9,7 @@
       [readonly]="!canEdit()"
       spellcheck="false"
       (change)="canEdit() ? listRenamed.emit({ listId: list().id, nombre: $any($event.target).value }) : null">
-    <span class="col-count">{{ list().cards.length }}</span>
+    <span class="col-count">{{ (list().cards || []).length }}</span>
     @if (canEdit()) {
       <button class="col-menu-btn" (click)="ctxMenu.emit({ event: $event, listId: list().id })">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

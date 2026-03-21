@@ -21,4 +21,6 @@ export interface Tarjeta {
   total_checklists?: number;
   total_comentarios?: number;
   total_archivos?: number;
+  tiempo_estimado?: number;
+  tiempo_dedicado?: number;
 }

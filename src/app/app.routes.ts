@@ -5,6 +5,7 @@ import { Registro } from './autenticacion/registro/registro';
 import { Inicio } from './paginas/inicio/inicio';
 import { TablerosComponent } from './paginas/tableros/tableros';
 import { authGuard } from './core/guards/auth.guard';
+import { boardMemberGuard } from './core/guards/board-member.guard';
 
 export const routes: Routes = [
   { path: '', component: Landing },
@@ -16,8 +17,8 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   { 
-    path: 'board/:id', 
+    path: 'board/:token', 
     component: TablerosComponent,
-    canActivate: [authGuard]
+    canActivate: [authGuard, boardMemberGuard]
   },
 ];

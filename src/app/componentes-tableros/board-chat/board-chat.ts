@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../core/services/auth.service';
 import { environment } from '../../../environments/environment';
+import { getInitials, fmtTime } from '../../core/utils/functions';
 
 export interface ChatReaction {
   emoji: string;
@@ -202,14 +203,8 @@ export class BoardChatComponent implements OnChanges, OnInit {
     return msg.userId === this.currentUser?.id;
   }
 
-  getInitials(name: string): string {
-    if (!name) return '?';
-    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-  }
-
-  formatTime(d: Date): string {
-    return new Date(d).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
+  public getInitials = getInitials;
+  public fmtTime     = fmtTime;
 
   private scrollToBottom() {
     setTimeout(() => {

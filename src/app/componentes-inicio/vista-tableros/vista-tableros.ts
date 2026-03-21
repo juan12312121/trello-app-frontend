@@ -7,6 +7,8 @@ import { CardService } from '../../core/services/card.service';
 import { ReminderService } from '../../core/services/reminder.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ModalCrearTablero } from '../modal-crear-tablero/modal-crear-tablero';
+import { normalizeServerUrl, isImage } from '../../core/utils/functions';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-vista-tableros',
@@ -23,6 +25,12 @@ export class VistaTablerosComponent {
   private reminderService = inject(ReminderService);
   private notificationService = inject(NotificationService);
 
+  public isImage = isImage;
+
+  normalizeUrl(url: string | undefined | null): string {
+    return normalizeServerUrl(url, environment.serverUrl);
+  }
+
   totalDueCount = signal(0);
 
   showCreateBoard = signal(false);
@@ -31,7 +39,10 @@ export class VistaTablerosComponent {
   // Signals para estadísticas centralizadas y filtro
   boards = computed(() => {
     const term = this.boardService.boardSearchQuery().trim().toLowerCase();
-    const all = this.boardService.boards();
+    const all = this.boardService.boards().map(b => {
+      const savedBg = localStorage.getItem(`board_bg_${b.id}`);
+      return savedBg ? { ...b, portada: savedBg } : b;
+    });
     if (!term) return all;
     return all.filter(b => b.nombre.toLowerCase().includes(term));
   });
@@ -146,20 +157,8 @@ export class VistaTablerosComponent {
     }
   }
 
-  openBoard(id: number) {
-    this.router.navigate(['/board', id]);
-  }
-
-  isImage(p: string | null | undefined): boolean {
-    return !!p?.startsWith('url');
-  }
-
-  normalizeUrl(url: string | undefined | null): string {
-    if (!url) return '';
-    if (url.includes('localhost:3000')) {
-      return url.replace('http://localhost:3000', 'https://trello-app-backend-1.onrender.com');
-    }
-    return url;
+  openBoard(board: any) {
+    this.router.navigate(['/board', board.token || board.id]);
   }
 
   onBoardCreated(newBoard: any) {

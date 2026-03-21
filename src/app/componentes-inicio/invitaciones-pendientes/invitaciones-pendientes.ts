@@ -39,10 +39,10 @@ export class InvitacionesPendientes implements OnInit {
   accept(id: number) {
     this.invitationService.acceptInvitation(id).subscribe({
       next: (res) => {
-        if (res.success && res.data.boardId) {
+        if (res.success) {
           this.notifService.notify('Invitación aceptada', 'success');
-          // Navegar al tablero que acabamos de aceptar
-          this.router.navigate(['/board', res.data.boardId]);
+          // Navegar al tablero que acabamos de aceptar usando el token
+          this.router.navigate(['/board', res.data.token || res.data.boardId]);
         }
       },
       error: (err) => this.notifService.notify(err.error?.message || 'Error al aceptar invitación', 'error')

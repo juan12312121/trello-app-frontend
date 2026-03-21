@@ -28,7 +28,7 @@
     </div>
 
     @for (board of paginatedBoards(); track board.id) {
-      <article class="board-card" (click)="board.id && openBoard(board.id)">
+      <article class="board-card" (click)="openBoard(board)">
         <div class="board-cover" 
              [ngClass]="!isImage(board.portada) ? (board.portada || 'c-blue') : ''" 
              [style.backgroundImage]="isImage(board.portada) ? normalizeUrl(board.portada) : ''">
@@ -72,7 +72,7 @@
               <div class="member-av" [style.background]="m.color" [title]="m.nombre">{{ m.initials }}</div>
             }
           </div>
-          <button class="btn-open" (click)="$event.stopPropagation(); board.id && openBoard(board.id)">Abrir</button>
+          <button class="btn-open" (click)="$event.stopPropagation(); openBoard(board)">Abrir</button>
         </div>
       </article>
     }

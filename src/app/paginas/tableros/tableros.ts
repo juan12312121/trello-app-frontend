@@ -17,6 +17,7 @@ import { ReminderService } from '../../core/services/reminder.service';
 import { InvitationService } from '../../core/services/invitation.service';
 import { TagService } from '../../core/services/tag.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { getInitials, fmtDate, normalizeServerUrl, isImage, filterByProp } from '../../core/utils/functions';
 
 import { SidebarComponent } from '../../componentes-tableros/sidebar/sidebar';
 import { TopbarComponent } from '../../componentes-tableros/topbar/topbar';
@@ -79,7 +80,7 @@ export class TablerosComponent implements OnInit, OnDestroy {
   activeCardId = signal<number | null>(null);
   
   // UI Selection
-  viewMode = signal<'kanban' | 'list' | 'calendar'>('kanban');
+  viewMode = signal<'kanban' | 'list' | 'calendar' | 'analytics'>('kanban');
   filterBy = signal<string | null>(null); // 'overdue', 'my-tasks', 'archived', 'attachments', 'tag-X'
   
   // Calendar State
@@ -92,32 +93,29 @@ export class TablerosComponent implements OnInit, OnDestroy {
   otherBoards = signal<any[]>([]);
   readonly today = new Date().toISOString().split('T')[0];
 
-  // ── Signals UI ─────────────────────────────────────────────────────
-  showInviteModal = signal(false);
-  showCreateCardModal = signal(false);
-  showDetailModal = signal(false);
-  showSettingsModal = signal(false);
-  showProfileModal  = signal(false);
+  // UI State
+  ui = {
+    showInvite: signal(false),
+    showCreateCard: signal(false),
+    showDetail: signal(false),
+    showSettings: signal(false),
+    showProfile: signal(false),
+    isSidebarOpen: signal(false),
+    showChat: signal(false),
+    focusMode: signal(false),
+    ctx: {
+      open: signal(false),
+      x: 0,
+      y: 0,
+      listId: signal<number | null>(null),
+      isArchived: signal(false)
+    }
+  };
+
   createCardTargetListId = signal<number | null>(null);
 
-  // Context menu
-  ctxOpen = signal(false);
-  ctxX = 0;
-  ctxY = 0;
-  ctxListId = signal<number | null>(null);
-  ctxIsArchived = signal(false);
-
-  // Focus Mode
-  focusMode = signal(false);
-  isSidebarOpen = signal(false);
-
-  toggleSidebar() {
-    this.isSidebarOpen.update(v => !v);
-  }
-
-  // Board Chat
-  showChat = signal(false);
-  toggleChat() { this.showChat.update(v => !v); }
+  toggleSidebar() { this.ui.isSidebarOpen.update(v => !v); }
+  toggleChat()    { this.ui.showChat.update(v => !v); }
 
   // Detalle activo
   // (Declarado más abajo u oculto)
@@ -139,12 +137,23 @@ export class TablerosComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      const id = +params['id'];
-      if (id) {
-        this.loadBoard(id);
-        this.initSocket(id);
+      const token = params['token'];
+      if (token) {
+        this.boardService.getBoardById(token).subscribe(res => {
+          if (res.success) {
+            this.board.set(res.data);
+            this.loadBoardExtras(res.data.id);
+            this.initSocket(res.data.id);
+          }
+        });
       }
     });
+  }
+
+  private loadBoardExtras(boardId: number) {
+    this.loadLists(boardId);
+    this.loadTags(boardId);
+    this.loadActivity(boardId);
   }
 
   initSocket(boardId: number) {
@@ -180,18 +189,22 @@ export class TablerosComponent implements OnInit, OnDestroy {
     if (isEditing) return;
 
     if (e.key === 'Escape') {
-      if (this.focusMode()) { this.focusMode.set(false); return; }
+      if (this.ui.focusMode()) { this.ui.focusMode.set(false); return; }
       this.closeDetail();
     }
     if (e.key.toLowerCase() === 'f') {
       e.preventDefault();
-      this.focusMode.update(v => !v);
+      this.ui.focusMode.update(v => !v);
     }
     if (e.key.toLowerCase() === 'g') {
       e.preventDefault();
-      this.showChat.update(v => !v);
+      this.ui.showChat.update(v => !v);
     }
   }
+
+  // Helper expose
+  public getInitials = getInitials;
+  public fmtDate = fmtDate;
 
   loadListsSilently(boardId: number) {
     this.listService.getLists(boardId).subscribe(res => {
@@ -223,6 +236,8 @@ export class TablerosComponent implements OnInit, OnDestroy {
     this.boardService.getBoardById(id).subscribe({
       next: (res) => {
         if (res.success) {
+          const savedBg = localStorage.getItem(`board_bg_${id}`);
+          if (savedBg) res.data.portada = savedBg;
           this.board.set(res.data);
           this.loadLists(id);
           this.loadTags(id);
@@ -299,6 +314,7 @@ export class TablerosComponent implements OnInit, OnDestroy {
   });
 
   allCards = computed(() => this.lists().flatMap(l => l.cards || []));
+  totalCompletedCards = computed(() => filterByProp(this.allCards(), 'completada', true).length);
 
   filteredLists = computed(() => {
     const rawLists = this.lists();
@@ -387,6 +403,36 @@ export class TablerosComponent implements OnInit, OnDestroy {
     return d.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase();
   });
 
+  // ── Analytics Logic ──────────────────────────────────────────────
+  analyticsData = computed(() => {
+    const boards = this.board();
+    const lists = this.lists();
+    const cards = this.allCards();
+    
+    // Distribution by List
+    const distribution = lists.map(l => ({
+      name: l.nombre,
+      count: l.cards?.length || 0
+    }));
+
+    // Productivity by Member
+    const memberStats = (boards?.miembros || []).map((m: any) => {
+      const assigned = cards.filter(c => c.usuario_asignado_id === m.id);
+      return {
+        name: m.nombre,
+        total: assigned.length,
+        completed: assigned.filter(c => c.completada).length,
+        time: assigned.reduce((s, c) => s + (c.tiempo_dedicado || 0), 0)
+      };
+    });
+
+    // Time Stats
+    const totalEstimated = cards.reduce((s, c) => s + (c.tiempo_estimado || 0), 0);
+    const totalDedicated = cards.reduce((s, c) => s + (c.tiempo_dedicado || 0), 0);
+
+    return { distribution, memberStats, totalEstimated, totalDedicated };
+  });
+
   prevMonth() {
     const d = this.calendarDate();
     this.calendarDate.set(new Date(d.getFullYear(), d.getMonth() - 1, 1));
@@ -407,6 +453,45 @@ export class TablerosComponent implements OnInit, OnDestroy {
        return c.fecha_vencimiento.startsWith(dStr);
     });
   }
+
+  // ── CSV Export ───────────────────────────────────────────────────
+  exportToCSV() {
+    const data = this.analyticsData();
+    let csv = "Miembro,Tareas Totales,Completadas,Minutos Registrados\n";
+    data.memberStats.forEach((m: any) => {
+      csv += `${m.name},${m.total},${m.completed},${m.time}\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Reporte_${this.board().nombre}_${this.today}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
+
+  // ── Simple Automations ──────────────────────────────────────────
+  private checkAutomations(cardId: number, targetListId: number) {
+    const list = this.getList(targetListId);
+    if (!list) return;
+
+    const doneKeywords = ['hecho', 'terminado', 'done', 'finalizado', 'completado'];
+    const isDoneList = doneKeywords.some(k => list.nombre.toLowerCase().includes(k));
+    
+    const cardDetail = this.getCardDetail(cardId);
+    if (!cardDetail) return;
+
+    // Si entra a "Hecho" y no está completada -> Marcar
+    if (isDoneList && !cardDetail.card.completada) {
+      this.onCardUpdated({ cardId, completada: true });
+    } 
+    // Si sale de "Hecho" a otra lista y estaba completada -> Desmarcar
+    else if (!isDoneList && cardDetail.card.completada) {
+      this.onCardUpdated({ cardId, completada: false });
+    }
+  }
+
   get overdueCount() { return this.allCards().filter(c => c.fecha_vencimiento && c.fecha_vencimiento < this.today && !c.completada).length; }
   get myTasksCount() {
     const userId = this.authService.currentUser()?.id;
@@ -415,6 +500,7 @@ export class TablerosComponent implements OnInit, OnDestroy {
   get archivedCount() { return this.lists().filter(l => l.archivada).length; }
   get attachmentsCount() { return this.allCards().reduce((s, c) => s + (c.attachments || 0), 0); }
 
+  // ── Helpers ───────────────────────────────────────────────────────
   getMember(id: number | null) {
     return this.board()?.miembros?.find((m: any) => m.id === id) ?? null;
   }
@@ -433,20 +519,6 @@ export class TablerosComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  fmtDate(d: any): string {
-    if (!d) return '—';
-    try {
-      const date = new Date(d);
-      if (typeof d === 'string' && d.length === 10 && d.includes('-')) {
-        date.setHours(12, 0, 0, 0);
-      }
-      if (isNaN(date.getTime())) return '—';
-      return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
-    } catch {
-      return '—';
-    }
-  }
-
   dueClass(d: string | null): string {
     if (!d) return '';
     if (d < this.today) return 'over';
@@ -455,22 +527,22 @@ export class TablerosComponent implements OnInit, OnDestroy {
   }
 
   // ── Modales ────────────────────────────────────────────────────────
-  openInvite() { this.showInviteModal.set(true); }
-  closeInvite() { this.showInviteModal.set(false); }
+  openInvite() { this.ui.showInvite.set(true); }
+  closeInvite() { this.ui.showInvite.set(false); }
 
   openCreateCard(listId: number | null) {
     this.createCardTargetListId.set(listId ?? this.lists()[0]?.id ?? null);
-    this.showCreateCardModal.set(true);
+    this.ui.showCreateCard.set(true);
   }
-  closeCreateCard() { this.showCreateCardModal.set(false); }
+  closeCreateCard() { this.ui.showCreateCard.set(false); }
 
   openDetail(cardId: number) {
     this.activeCardId.set(cardId);
-    this.showDetailModal.set(true);
+    this.ui.showDetail.set(true);
   }
   closeDetail() {
     this.activeCardId.set(null);
-    this.showDetailModal.set(false);
+    this.ui.showDetail.set(false);
   }
 
   // ── Context menu ───────────────────────────────────────────────────
@@ -479,26 +551,26 @@ export class TablerosComponent implements OnInit, OnDestroy {
     e.event.stopPropagation();
     
     // Toggle behavior: Close if already open for this list
-    if (this.ctxOpen() && this.ctxListId() === e.listId) {
+    if (this.ui.ctx.open() && this.ui.ctx.listId() === e.listId) {
        this.closeCtx();
        return;
     }
 
-    this.ctxX = e.event.clientX;
-    this.ctxY = e.event.clientY;
-    this.ctxListId.set(e.listId);
+    this.ui.ctx.x = e.event.clientX;
+    this.ui.ctx.y = e.event.clientY;
+    this.ui.ctx.listId.set(e.listId);
     
     const list = this.getList(e.listId);
-    this.ctxIsArchived.set(list?.archivada || false);
+    this.ui.ctx.isArchived.set(list?.archivada || false);
     
-    this.ctxOpen.set(true);
+    this.ui.ctx.open.set(true);
   }
 
-  closeCtx() { this.ctxOpen.set(false); }
+  closeCtx() { this.ui.ctx.open.set(false); }
 
   ctxAction(action: string) {
-    this.ctxOpen.set(false);
-    const listId = this.ctxListId();
+    this.ui.ctx.open.set(false);
+    const listId = this.ui.ctx.listId();
     if (listId === null || !this.board()) return;
 
     const list = this.getList(listId);
@@ -548,7 +620,7 @@ export class TablerosComponent implements OnInit, OnDestroy {
     }).subscribe({
       next: () => {
         this.loadLists(boardId);
-        this.showCreateCardModal.set(false);
+        this.ui.showCreateCard.set(false);
       },
       error: (err) => {
         console.error('Error al crear tarjeta:', err);
@@ -586,7 +658,9 @@ export class TablerosComponent implements OnInit, OnDestroy {
       const sourceListId = parseInt(e.previousContainer.id.replace('list-', ''), 10);
       const targetListId = payload.listId;
 
-      this.cardService.moveCard(boardId, sourceListId, card.id, targetListId, e.currentIndex).subscribe();
+      this.cardService.moveCard(boardId, sourceListId, card.id, targetListId, e.currentIndex).subscribe(() => {
+        this.checkAutomations(card.id, targetListId);
+      });
     }
   }
 
@@ -600,7 +674,8 @@ export class TablerosComponent implements OnInit, OnDestroy {
     this.cardService.moveCard(boardId, sourceDetail.list.id, e.cardId, e.targetListId, 0).subscribe({
       next: () => {
         this.loadLists(boardId);
-        this.showDetailModal.set(false); // Cerrar tarjeta para indicar que se movió exitosamente
+        this.checkAutomations(e.cardId, e.targetListId);
+        this.ui.showDetail.set(false); // Cerrar tarjeta para indicar que se movió exitosamente
       },
       error: () => this.loadLists(boardId)
     });
@@ -610,7 +685,7 @@ export class TablerosComponent implements OnInit, OnDestroy {
     if (!this.board()) return;
     this.cardService.deleteCard(this.board().id, 0, cardId).subscribe(() => {
       this.loadLists(this.board().id);
-      this.showDetailModal.set(false);
+      this.ui.showDetail.set(false);
     });
   }
 
@@ -716,26 +791,34 @@ export class TablerosComponent implements OnInit, OnDestroy {
 
   onBackgroundChanged(file: File) {
     if (!this.board()) return;
+
+    // Convert to Base64 and save to localStorage
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      try {
+        const base64Url = `url(${e.target.result})`;
+        localStorage.setItem(`board_bg_${this.board().id}`, base64Url);
+        // Instant update
+        this.board.update(b => ({ ...b, portada: base64Url }));
+      } catch (err) {
+        console.warn('LocalStorage limit reached', err);
+      }
+    };
+    reader.readAsDataURL(file);
+
     this.boardService.updateBoardBackground(this.board().id, file).subscribe(res => {
       if (res.success) {
-        // Actualizamos el signal local para que cambie el fondo al instante
+        const savedBg = localStorage.getItem(`board_bg_${this.board().id}`);
+        if (savedBg) res.data.portada = savedBg;
         this.board.set(res.data);
       }
     });
   }
 
-  isImage(p: string | undefined | null): boolean {
-    return !!p?.startsWith('url');
-  }
+  public isImage = isImage;
 
   normalizeUrl(url: string | undefined | null): string {
-    if (!url) return '';
-    // Si contiene localhost y estamos en producción (o queremos forzar la ruta de Render)
-    // lo reemplazamos por la URL del servidor actual.
-    if (url.includes('localhost:3000')) {
-      return url.replace('http://localhost:3000', environment.serverUrl);
-    }
-    return url;
+    return normalizeServerUrl(url, environment.serverUrl);
   }
 
   handleLogout() {

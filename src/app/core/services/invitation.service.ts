@@ -39,7 +39,7 @@ export class InvitationService {
   }
 
   // Aceptar invitación a tablero
-  acceptInvitation(invitationId: number): Observable<{success: boolean, data: {boardId: number}}> {
+  acceptInvitation(invitationId: number): Observable<{success: boolean, data: {boardId: number, token: string}}> {
     return this.http.patch<any>(`${this.apiUrl}/invitations/${invitationId}/accept`, {});
   }
 

@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { BoardService } from '../../core/services/board.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ListService } from '../../core/services/list.service';
+import { isImage } from '../../core/utils/functions';
 
 @Component({
   selector: 'app-modal-crear-tablero',
@@ -45,7 +46,7 @@ export class ModalCrearTablero {
     'url(https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1920&q=80)'
   ];
 
-  isImage(p: string) { return p.startsWith('url'); }
+  public isImage = isImage;
 
   async crear() {
     if (!this.nombre.trim() || this.isGeneratingColumns) return;

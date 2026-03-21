@@ -1,15 +1,12 @@
-import { Injectable, signal, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
-import { environment } from '../../../environments/environment';
-import { Board, Lista, Tarjeta, Tag, User, Comentario, Checklist, ChecklistItem } from '../models';
+import { Board } from '../models';
+import { BaseService } from './base.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class BoardService {
-  private http = inject(HttpClient);
-  private readonly apiUrl = environment.apiUrl;
+export class BoardService extends BaseService {
 
   // Signals para estado global de tableros.
   boards = signal<Board[]>([]);
@@ -19,7 +16,7 @@ export class BoardService {
   // ── Tableros ──────────────────────────────────────────────────────────
 
   getBoards(): Observable<{success: boolean, data: Board[]}> {
-    return this.http.get<{success: boolean, data: Board[]}>(`${this.apiUrl}/boards`).pipe(
+    return this.get<{success: boolean, data: Board[]}>('/boards').pipe(
       tap(res => {
         if (res.success) {
           this.boards.set(Array.isArray(res.data) ? res.data : []);
@@ -28,8 +25,8 @@ export class BoardService {
     );
   }
 
-  getBoardById(id: number): Observable<{success: boolean, data: Board}> {
-    return this.http.get<{success: boolean, data: Board}>(`${this.apiUrl}/boards/${id}`).pipe(
+  getBoardById(id: number | string): Observable<{success: boolean, data: Board}> {
+    return this.get<{success: boolean, data: Board}>(`/boards/${id}`).pipe(
       tap(res => {
         if (res.success) this.activeBoard.set(res.data);
       })
@@ -37,7 +34,7 @@ export class BoardService {
   }
 
   createBoard(board: Partial<Board>): Observable<{success: boolean, data: Board}> {
-    return this.http.post<{success: boolean, data: Board}>(`${this.apiUrl}/boards`, board).pipe(
+    return this.post<{success: boolean, data: Board}>('/boards', board).pipe(
       tap(res => {
         if (res.success) this.boards.update(prev => [...prev, res.data]);
       })
@@ -45,7 +42,7 @@ export class BoardService {
   }
 
   updateBoard(boardId: number, board: Partial<Board>): Observable<{success: boolean, data: Board}> {
-    return this.http.patch<{success: boolean, data: Board}>(`${this.apiUrl}/boards/${boardId}`, board).pipe(
+    return this.patch<{success: boolean, data: Board}>(`/boards/${boardId}`, board).pipe(
       tap(res => {
         if (res.success) {
           this.boards.update(prev => prev.map(b => b.id === boardId ? { ...b, ...board } : b));
@@ -57,15 +54,15 @@ export class BoardService {
   updateBoardBackground(boardId: number, file: File): Observable<{success: boolean, data: Board}> {
     const formData = new FormData();
     formData.append('portada', file);
-    return this.http.patch<{success: boolean, data: Board}>(`${this.apiUrl}/boards/${boardId}`, formData);
+    return this.patch<{success: boolean, data: Board}>(`/boards/${boardId}`, formData);
   }
 
   archiveBoard(boardId: number): Observable<{success: boolean}> {
-    return this.http.patch<{success: boolean}>(`${this.apiUrl}/boards/${boardId}/archive`, {});
+    return this.patch<{success: boolean}>(`/boards/${boardId}/archive`, {});
   }
 
   deleteBoard(boardId: number): Observable<{success: boolean}> {
-    return this.http.delete<{success: boolean}>(`${this.apiUrl}/boards/${boardId}`).pipe(
+    return this.delete<{success: boolean}>(`/boards/${boardId}`).pipe(
       tap(res => {
         if (res.success) {
           this.boards.update(prev => prev.filter(b => b.id !== boardId));

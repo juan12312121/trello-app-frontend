@@ -2,6 +2,7 @@ import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Lista, Tarjeta, Tag, User } from '../../core/models';
+import { fmtDate } from '../../core/utils/functions';
 
 @Component({
   selector: 'app-columna-lista',
@@ -50,19 +51,7 @@ export class ColumnaListaComponent {
     return this.tags().find(t => t.id === id) ?? null;
   }
 
-  fmtDate(d: any): string {
-    if (!d) return '—';
-    try {
-      const date = new Date(d);
-      if (typeof d === 'string' && d.length === 10 && d.includes('-')) {
-        date.setHours(12, 0, 0, 0);
-      }
-      if (isNaN(date.getTime())) return '—';
-      return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
-    } catch {
-      return '—';
-    }
-  }
+  public fmtDate = fmtDate;
 
   dueClass(d: string | null): string {
     const t = this.today();

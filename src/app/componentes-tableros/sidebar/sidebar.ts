@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Board, Lista, Tarjeta, Tag } from '../../core/models';
 import { AuthService } from '../../core/services/auth.service';
 import { environment } from '../../../environments/environment';
+import { normalizeServerUrl, isImage } from '../../core/utils/functions';
 
 @Component({
   selector: 'app-sidebar',
@@ -45,8 +46,8 @@ export class SidebarComponent {
     this.router.navigate(['/dashboard']);
   }
 
-  goToBoard(id: number) {
-    this.router.navigate(['/boards', id]);
+  goToBoard(board: any) {
+    this.router.navigate(['/board', board.token || board.id]);
   }
 
   triggerBgUpload() {
@@ -60,15 +61,9 @@ export class SidebarComponent {
     input.click();
   }
 
-  isImage(p: string | undefined | null): boolean {
-    return !!p?.startsWith('url');
-  }
+  public isImage = isImage;
 
   normalizeUrl(url: string | undefined | null): string {
-    if (!url) return '';
-    if (url.includes('localhost:3000')) {
-      return url.replace('http://localhost:3000', environment.apiUrl.replace('/api/v1', ''));
-    }
-    return url;
+    return normalizeServerUrl(url, environment.apiUrl.replace('/api/v1', ''));
   }
 }

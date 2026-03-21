@@ -116,8 +116,6 @@ export class ListaTareasAsignadas implements OnInit {
   }
 
   openCard(task: any) {
-    // Para abrir la tarjeta, navegamos al tablero y usamos un query param o simplemente el router
-    // Por ahora, solo navegamos al tablero
-    this.router.navigate(['/board', task.board_id]);
+    this.router.navigate(['/board', task.board_token || task.board_id]);
   }
 }
