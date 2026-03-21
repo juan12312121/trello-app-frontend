@@ -1,8 +1,12 @@
 @if (board()) {
-<div class="app-shell" [class.focus-mode]="focusMode()"
+<div class="app-shell" [class.focus-mode]="focusMode()" [class.sidebar-open]="isSidebarOpen()"
   [ngClass]="!isImage(board().portada) ? (board().portada || 'c-blue') : ''"
   [style.backgroundImage]="isImage(board().portada) ? normalizeUrl(board().portada) : ''" [style.backgroundSize]="'cover'"
   [style.backgroundPosition]="'center'">
+
+  @if (isSidebarOpen()) {
+    <div class="sidebar-overlay" (click)="isSidebarOpen.set(false)"></div>
+  }
 
   <!-- SIDEBAR -->
   <app-sidebar class="shell-sidebar" [board]="board()" [lists]="lists()" [tags]="tags()" [activity]="activity()"
@@ -21,7 +25,7 @@
     <!-- TOPBAR (incluye cover-stripe) -->
     <app-topbar [board]="board()" [isAdmin]="isAdmin()" [canEdit]="canEdit()" (openInvite)="openInvite()"
       (openCreateCard)="openCreateCard(null)" (openSettings)="showSettingsModal.set(true)"
-      (boardRenamed)="board().nombre = $event">
+      (boardRenamed)="board().nombre = $event" (toggleSidebar)="toggleSidebar()">
     </app-topbar>
 
     <!-- CHAT TOGGLE BUTTON -->

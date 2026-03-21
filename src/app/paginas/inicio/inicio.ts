@@ -57,6 +57,7 @@ export class Inicio implements OnInit {
   showProfileModal = signal(false);
   showCreateBoard = signal(false);
   activeView = signal<'boards' | 'tasks' | 'reminders' | 'activity' | 'analytics'>('boards');
+  isSidebarOpen = signal(false);
 
   loading = signal(true);
 

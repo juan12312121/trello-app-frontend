@@ -29,7 +29,7 @@
   border: 1px solid var(--bd2);
   border-radius: 24px;
   width: 100%;
-  max-width: 860px; /* Un pelín más ancho para mayor comodidad */
+  max-width: 860px;
   max-height: 94vh;
   display: flex;
   flex-direction: column;
@@ -68,6 +68,26 @@
   padding: 20px 24px;
   overflow-y: auto;
   overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Scrollbar styling */
+.mc-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.mc-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mc-body::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 4px;
+}
+
+.mc-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
 }
 
 /* Header */
@@ -76,6 +96,7 @@
   gap: 12px;
   margin-bottom: 16px;
   align-items: flex-start;
+  flex-shrink: 0;
 }
 
 .mc-icon {
@@ -270,6 +291,7 @@
   line-height: 1.6;
   transition: all 0.3s ease;
   margin-bottom: 20px;
+  box-sizing: border-box;
 }
 
 .mc-desc:focus {
@@ -405,6 +427,7 @@
   outline: none;
   margin-top: 4px;
   box-shadow: var(--sh-focus);
+  box-sizing: border-box;
 }
 
 /* Comentarios */
@@ -506,6 +529,7 @@
   min-height: 40px;
   display: flex;
   align-items: center;
+  box-sizing: border-box;
 }
 
 .cmt-input:focus {
@@ -674,6 +698,7 @@
   background: var(--s2);
   outline: none;
   transition: all 0.2s var(--ease);
+  box-sizing: border-box;
 }
 
 .form-select-sm:focus,
@@ -721,6 +746,7 @@
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   margin-bottom: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  box-sizing: border-box;
 }
 
 .mc-action-btn svg {
@@ -752,31 +778,32 @@
 .att-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 4px;
   margin-top: 10px;
 }
 
 .att-item {
   display: flex;
-  gap: 12px;
-  padding: 8px;
-  border-radius: var(--r-md);
+  gap: 6px;
+  padding: 2px 4px;
+  border-radius: 6px;
   background: var(--surface);
   border: 1px solid var(--bd);
   transition: all 0.2s var(--ease);
+  box-sizing: border-box;
 }
 
 .att-item:hover {
   background: var(--s2);
   border-color: var(--bd2);
-  transform: translateX(4px);
+  transform: translateX(2px);
 }
 
 .att-preview {
-  width: 56px;
-  height: 48px;
+  width: 32px;
+  height: 28px;
   background: var(--s3);
-  border-radius: var(--r-sm);
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -816,7 +843,7 @@
 .att-preview[data-type*="zip"] .att-file-icon, .att-preview[data-type*="rar"] .att-file-icon { color: #b45309; }
 
 .att-file-icon {
-  font-size: 0.7rem;
+  font-size: 0.5rem;
   font-weight: 800;
   color: var(--t2);
 }
@@ -831,7 +858,7 @@
 
 .att-name {
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.7rem;
   color: var(--t1);
   white-space: nowrap;
   overflow: hidden;
@@ -839,12 +866,12 @@
 }
 
 .att-meta {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   color: var(--t3);
   display: flex;
   align-items: center;
-  gap: 5px;
-  margin-top: 2px;
+  gap: 3px;
+  margin-top: 0px;
 }
 
 .att-act {
@@ -853,6 +880,7 @@
   cursor: pointer;
   font-weight: 700;
   transition: color 0.2s;
+  font-size: 0.6rem;
 }
 
 .att-act:hover { color: var(--blue-d); text-decoration: underline; }
@@ -926,6 +954,7 @@
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
   margin-top: 10px;
+  box-sizing: border-box;
 }
 
 .btn-save-card:hover {
@@ -943,6 +972,37 @@
   height: 18px;
   stroke: #fff;
   stroke-width: 2.5;
+}
+
+/* Formulario de recordatorio */
+.reminder-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: rgba(37, 99, 235, 0.05);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  border-radius: 12px;
+  margin-top: 8px;
+  box-sizing: border-box;
+}
+
+.reminder-form input,
+.reminder-form textarea {
+  box-sizing: border-box;
+}
+
+/* Tag picker */
+.tag-picker {
+  box-sizing: border-box;
+}
+
+.tag-row {
+  box-sizing: border-box;
+}
+
+.tag-row input {
+  box-sizing: border-box;
 }
 
 /* Extra responsive */

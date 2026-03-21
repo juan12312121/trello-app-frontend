@@ -109,6 +109,11 @@ export class TablerosComponent implements OnInit, OnDestroy {
 
   // Focus Mode
   focusMode = signal(false);
+  isSidebarOpen = signal(false);
+
+  toggleSidebar() {
+    this.isSidebarOpen.update(v => !v);
+  }
 
   // Board Chat
   showChat = signal(false);

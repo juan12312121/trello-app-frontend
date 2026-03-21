@@ -15,6 +15,22 @@
   z-index: 50;
 }
 
+.menu-toggle {
+  display: none;
+  align-items: center; justify-content: center;
+  width: 36px; height: 36px;
+  border: none; background: none; color: var(--t2);
+  cursor: pointer; padding: 6px; border-radius: var(--r-md);
+  transition: all .13s; flex-shrink: 0;
+}
+.menu-toggle:hover { background: var(--s2); color: var(--t1); }
+.menu-toggle svg { width: 22px; height: 22px; }
+
+@media (max-width: 900px) {
+  .menu-toggle { display: flex; }
+  .topbar { padding: 0 16px; }
+}
+
 .topbar-title {
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-weight: 800;

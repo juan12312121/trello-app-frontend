@@ -15,6 +15,7 @@
   height: 64px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
 }
 
@@ -26,14 +27,21 @@
   color: #0f172a;
   text-decoration: none;
   flex-shrink: 0;
+  z-index: 1001; /* Ensure logo is above menu toggle */
 }
 .logo span { color: #3b82f6; }
+
+.nav-content {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+}
 
 .nav-links {
   display: flex;
   gap: 0.5rem;
   margin-left: 2rem;
-  flex: 1;
 }
 .nav-links a {
   font-family: 'DM Sans', sans-serif;
@@ -94,7 +102,92 @@
   box-shadow: 0 4px 12px rgba(59,130,246,.3);
 }
 
-@media (max-width: 768px) {
-  .nav-links { display: none; }
-  .btn-ghost  { display: none; }
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 1001;
+  padding: 5px;
+}
+
+.menu-toggle .bar {
+  width: 24px;
+  height: 2px;
+  background-color: #0f172a;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 960px) {
+  .menu-toggle { display: flex; }
+
+  .nav-content {
+    position: absolute;
+    top: 64px;
+    left: 0;
+    width: 100%;
+    background: white;
+    flex-direction: column;
+    padding: 2rem;
+    gap: 2rem;
+    border-bottom: 1px solid #e2e8f0;
+    transform: translateY(-150%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    visibility: hidden;
+    height: calc(100vh - 64px);
+    justify-content: flex-start;
+  }
+
+  .nav-content.is-open {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    width: 100%;
+    margin-left: 0;
+    gap: 1rem;
+  }
+
+  .nav-links a {
+    font-size: 1.1rem;
+    padding: 1rem;
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .nav-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+  }
+
+  .btn-ghost, .btn-cta {
+    width: 100%;
+    justify-content: center;
+    height: 48px;
+    font-size: 1rem;
+  }
+
+  /* Hamburger Animation */
+  .menu-toggle[aria-expanded="true"] .bar:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .menu-toggle[aria-expanded="true"] .bar:nth-child(2) {
+    opacity: 0;
+  }
+  .menu-toggle[aria-expanded="true"] .bar:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
 }

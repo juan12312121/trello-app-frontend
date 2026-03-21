@@ -1,17 +1,21 @@
 <!-- inicio.component.html -->
-<div class="dashboard-wrapper">
+<div class="dashboard-wrapper" [class.sidebar-open]="isSidebarOpen()">
+
+  @if (isSidebarOpen()) {
+    <div class="sidebar-overlay" (click)="isSidebarOpen.set(false)"></div>
+  }
 
   <!-- Sidebar -->
   <app-aside-inicio 
     (openProfile)="showProfileModal.set(true)"
-    (viewChanged)="activeView.set($event)">
+    (viewChanged)="activeView.set($event); isSidebarOpen.set(false)">
   </app-aside-inicio>
 
   <!-- Main content -->
   <main class="main">
 
     <!-- Topbar -->
-    <app-header-inicio></app-header-inicio>
+    <app-header-inicio (toggleSidebar)="isSidebarOpen.set(!isSidebarOpen())"></app-header-inicio>
 
     <!-- Page body -->
     <div class="page-body">

@@ -3,16 +3,24 @@
 
     <a class="logo" routerLink="/">Task<span>Flow</span></a>
 
-    <div class="nav-links">
-      <a href="#features">Características</a>
-      <a href="#demo">Demo</a>
-      <a href="#how">Cómo funciona</a>
-      <a href="#pricing">Precios</a>
-    </div>
+    <button class="menu-toggle" (click)="toggleMenu()" [attr.aria-expanded]="isMenuOpen">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
 
-    <div class="nav-actions">
-      <a routerLink="/login" class="btn-ghost">Iniciar sesión</a>
-      <a routerLink="/register" class="btn-cta">Comenzar Gratis</a>
+    <div class="nav-content" [class.is-open]="isMenuOpen">
+      <div class="nav-links">
+        <a href="#features" (click)="isMenuOpen = false">Características</a>
+        <a href="#demo" (click)="isMenuOpen = false">Demo</a>
+        <a href="#how" (click)="isMenuOpen = false">Cómo funciona</a>
+        <a href="#pricing" (click)="isMenuOpen = false">Precios</a>
+      </div>
+
+      <div class="nav-actions">
+        <a routerLink="/login" class="btn-ghost">Iniciar sesión</a>
+        <a routerLink="/register" class="btn-cta">Comenzar Gratis</a>
+      </div>
     </div>
 
   </nav>

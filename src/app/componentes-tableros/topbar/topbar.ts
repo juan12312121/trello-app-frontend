@@ -22,6 +22,7 @@ export class TopbarComponent {
   openCreateCard = output<void>();
   openSettings   = output<void>();
   boardRenamed   = output<string>();
+  toggleSidebar  = output<void>();
 
   private router = inject(Router);
   private reminderService = inject(ReminderService);

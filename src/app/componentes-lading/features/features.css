@@ -69,3 +69,10 @@
   line-height: 1.7;
   margin: 0;
 }
+
+@media (max-width: 630px) {
+  .features-section { padding: 3rem 1.25rem; }
+  .section-header { margin-bottom: 2.5rem; }
+  .section-header h2 { font-size: 1.85rem; }
+  .features-grid { grid-template-columns: 1fr; }
+}

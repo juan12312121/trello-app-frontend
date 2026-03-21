@@ -152,4 +152,11 @@
 @media (max-width: 900px) {
   .plan-card.featured { transform: scale(1); }
   .plan-card.featured:hover { transform: translateY(-5px); }
+  .pricing-section { padding: 3.5rem 1.5rem; }
+  .section-header h2 { font-size: 1.85rem; }
+}
+
+@media (max-width: 600px) {
+  .pricing-grid { grid-template-columns: 1fr; }
+  .plan-card { max-width: 400px; margin: 0 auto; width: 100%; }
 }
