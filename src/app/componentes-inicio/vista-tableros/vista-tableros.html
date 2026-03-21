@@ -31,7 +31,7 @@
       <article class="board-card" (click)="board.id && openBoard(board.id)">
         <div class="board-cover" 
              [ngClass]="!isImage(board.portada) ? (board.portada || 'c-blue') : ''" 
-             [style.backgroundImage]="isImage(board.portada) ? board.portada : ''">
+             [style.backgroundImage]="isImage(board.portada) ? normalizeUrl(board.portada) : ''">
           <span class="board-badge">Propietario</span>
           <button class="board-menu-btn" (click)="toggleMenu(board.id!, $event)">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>

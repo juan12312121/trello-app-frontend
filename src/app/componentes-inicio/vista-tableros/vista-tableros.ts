@@ -154,6 +154,14 @@ export class VistaTablerosComponent {
     return !!p?.startsWith('url');
   }
 
+  normalizeUrl(url: string | undefined | null): string {
+    if (!url) return '';
+    if (url.includes('localhost:3000')) {
+      return url.replace('http://localhost:3000', 'https://trello-app-backend-1.onrender.com');
+    }
+    return url;
+  }
+
   onBoardCreated(newBoard: any) {
     this.showCreateBoard.set(false);
   }
