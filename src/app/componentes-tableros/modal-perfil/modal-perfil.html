@@ -45,40 +45,44 @@
 
         <!-- COL 2: PREFERENCIAS -->
         <div class="m-card">
-          <h3 class="c-title">Personalización</h3>
+          <h3 class="c-title">Preferencias Visuales</h3>
           
-          <div class="pref-item">
-            <div class="pref-text">
-              <strong>Modo Oscuro</strong>
-              <span>Interfaz con menos brillo</span>
-            </div>
-            <button class="btn-toggle" [class.dark]="themeService.currentTheme() !== 'light'" (click)="themeService.toggleTheme()">
-              <div class="t-circle"></div>
-            </button>
-          </div>
-
           <div class="pref-item-stack">
             <div class="pref-text">
-              <strong>Color de Énfasis</strong>
-              <span>Escoge tu tonalidad favorita</span>
+              <strong>Tipografía Principal</strong>
+              <span>Cambia el estilo de fuente de la app</span>
             </div>
-            <div class="theme-grid">
-              <button class="theme-opt light" title="Claro" [class.active]="themeService.currentTheme() === 'light'" (click)="themeService.setTheme('light')"></button>
-              <button class="theme-opt dark" title="Oscuro" [class.active]="themeService.currentTheme() === 'dark'" (click)="themeService.setTheme('dark')"></button>
-              <button class="theme-opt purple" title="Ametista" [class.active]="themeService.currentTheme() === 'purple'" (click)="themeService.setTheme('purple')"></button>
-              <button class="theme-opt emerald" title="Esmeralda" [class.active]="themeService.currentTheme() === 'emerald'" (click)="themeService.setTheme('emerald')"></button>
-              <button class="theme-opt rose" title="Sakura" [class.active]="themeService.currentTheme() === 'rose'" (click)="themeService.setTheme('rose')"></button>
-            </div>
+            <select class="pref-select" [ngModel]="themeService.currentFont()" (ngModelChange)="themeService.setFont($event)">
+              <option value="Inter">Inter (Predeterminado)</option>
+              <option value="Roboto">Roboto</option>
+              <option value="Outfit">Outfit</option>
+              <option value="Montserrat">Montserrat</option>
+              <option value="Poppins">Poppins</option>
+            </select>
           </div>
 
-          <div class="pref-item-stack" style="margin-top:auto;">
-             <div class="pref-text">
-               <strong>Idioma</strong>
+          <div class="pref-item-stack" style="margin-top:20px;">
+             <h3 class="c-title" style="margin-bottom:10px;">Configuración del Sistema</h3>
+             <div class="pref-item">
+               <div class="pref-text">
+                 <strong>Animaciones Suaves</strong>
+                 <span>Efectos visuales en transiciones</span>
+               </div>
+               <button class="btn-toggle dark">
+                 <div class="t-circle"></div>
+               </button>
              </div>
-             <select class="pref-select">
-                <option value="es" selected>Español</option>
-                <option value="en">English (Próximamente)</option>
-             </select>
+
+             <div class="pref-item" style="margin-top:12px;">
+               <div class="pref-text">
+                 <strong>Idioma</strong>
+                 <span>Próximamente más opciones</span>
+               </div>
+               <select class="pref-select" style="width: auto;">
+                  <option value="es" selected>Español</option>
+                  <option value="en">English (Pronto)</option>
+               </select>
+             </div>
           </div>
 
         </div>

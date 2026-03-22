@@ -45,10 +45,7 @@ export class VistaTablerosComponent {
     const currentTab = this.activeTab();
     const user = this.authService.currentUser();
     
-    let allBoards = this.boardService.boards().map(b => {
-      const savedBg = localStorage.getItem(`board_bg_${b.id}`);
-      return savedBg ? { ...b, portada: savedBg } : b;
-    });
+    let allBoards = this.boardService.boards().map(b => b);
 
     if (currentTab === 'archived') {
        allBoards = allBoards.filter(b => b.archivado);

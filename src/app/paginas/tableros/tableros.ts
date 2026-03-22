@@ -141,9 +141,6 @@ export class TablerosComponent implements OnInit, OnDestroy {
       if (token) {
         this.boardService.getBoardById(token).subscribe(res => {
           if (res.success) {
-            // Apply localStorage background override if available
-            const savedBg = localStorage.getItem(`board_bg_${res.data.id}`);
-            if (savedBg) res.data.portada = savedBg;
             this.board.set(res.data);
             this.loadBoardExtras(res.data.id);
             this.initSocket(res.data.id);
@@ -245,8 +242,6 @@ export class TablerosComponent implements OnInit, OnDestroy {
     this.boardService.getBoardById(id).subscribe({
       next: (res) => {
         if (res.success) {
-          const savedBg = localStorage.getItem(`board_bg_${id}`);
-          if (savedBg) res.data.portada = savedBg;
           this.board.set(res.data);
           this.loadLists(id);
           this.loadTags(id);
@@ -808,24 +803,17 @@ export class TablerosComponent implements OnInit, OnDestroy {
   onBackgroundChanged(file: File) {
     if (!this.board()) return;
 
-    // Convert to Base64 and save to localStorage
+    // Instant preview with base64
     const reader = new FileReader();
     reader.onload = (e: any) => {
-      try {
-        const base64Url = `url(${e.target.result})`;
-        localStorage.setItem(`board_bg_${this.board().id}`, base64Url);
-        // Instant update
-        this.board.update(b => ({ ...b, portada: base64Url }));
-      } catch (err) {
-        console.warn('LocalStorage limit reached', err);
-      }
+      const base64Url = `url(${e.target.result})`;
+      this.board.update(b => ({ ...b, portada: base64Url }));
     };
     reader.readAsDataURL(file);
 
+    // Upload to server (stores base64 in DB)
     this.boardService.updateBoardBackground(this.board().id, file).subscribe(res => {
       if (res.success) {
-        const savedBg = localStorage.getItem(`board_bg_${this.board().id}`);
-        if (savedBg) res.data.portada = savedBg;
         this.board.set(res.data);
       }
     });

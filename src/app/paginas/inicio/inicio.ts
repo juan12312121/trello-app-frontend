@@ -84,10 +84,6 @@ export class Inicio implements OnInit {
         e.preventDefault();
         (document.querySelector('.search-bar input') as HTMLInputElement)?.focus();
         break;
-      case 't':
-        e.preventDefault();
-        this.themeService.toggleTheme();
-        break;
     }
   }
 

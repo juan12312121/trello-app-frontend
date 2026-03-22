@@ -1,7 +1,7 @@
 html, body { height: 100%; }
 body { 
   margin: 0; 
-  font-family: 'Inter', 'Plus Jakarta Sans', -apple-system, sans-serif; 
+  font-family: var(--main-font, 'Inter', 'Plus Jakarta Sans', -apple-system, sans-serif); 
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -10,6 +10,7 @@ body {
 }
 
 :root {
+  --main-font: 'Inter', sans-serif;
   /* Common */
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
   --r-sm: 6px; --r-md: 10px; --r-lg: 14px; --r-xl: 20px; --r-f: 9999px;
