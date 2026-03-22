@@ -139,6 +139,15 @@ export class ModalAjustesTableroComponent extends BaseModalComponent {
     if (!this.isAdmin()) return;
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
+    // Save to localStorage for instant display (same as topbar upload)
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      try {
+        const base64Url = `url(${e.target.result})`;
+        localStorage.setItem(`board_bg_${this.board().id}`, base64Url);
+      } catch (err) { /* localStorage limit */ }
+    };
+    reader.readAsDataURL(file);
     this.boardService.updateBoardBackground(this.board().id, file).subscribe(() => {
       this.boardChanged.emit();
     });

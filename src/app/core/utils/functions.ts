@@ -35,7 +35,7 @@ export function getMemberInitials(name: string | undefined): string {
 export function normalizeServerUrl(url: string | undefined | null, serverUrl: string): string {
   if (!url) return '';
   if (url.includes('localhost:3000')) {
-    return url.replace('http://localhost:3000', serverUrl);
+    return url.replace(/https?:\/\/localhost:3000/g, serverUrl);
   }
   return url;
 }

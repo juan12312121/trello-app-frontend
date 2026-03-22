@@ -141,6 +141,9 @@ export class TablerosComponent implements OnInit, OnDestroy {
       if (token) {
         this.boardService.getBoardById(token).subscribe(res => {
           if (res.success) {
+            // Apply localStorage background override if available
+            const savedBg = localStorage.getItem(`board_bg_${res.data.id}`);
+            if (savedBg) res.data.portada = savedBg;
             this.board.set(res.data);
             this.loadBoardExtras(res.data.id);
             this.initSocket(res.data.id);
