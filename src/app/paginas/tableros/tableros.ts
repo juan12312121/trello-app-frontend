@@ -176,6 +176,11 @@ export class TablerosComponent implements OnInit, OnDestroy {
     this.socket.on('board_updated', () => {
       this.loadListsSilently(boardId);
     });
+
+    // Escuchamos cambios de fondo en tiempo real
+    this.socket.on('board:bg_changed', (data: { portada: string }) => {
+      this.board.update(b => b ? { ...b, portada: data.portada } : b);
+    });
   }
 
   ngOnDestroy() {
