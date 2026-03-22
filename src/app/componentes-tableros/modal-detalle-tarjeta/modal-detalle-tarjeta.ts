@@ -53,6 +53,7 @@ export class ModalDetalleTarjetaComponent extends BaseModalComponent implements 
   cardDeleted      = output<number>();
   tagToggled       = output<{cardId: number, tagId: number, assign: boolean}>();
   tagCreated       = output<{nombre: string, color: string}>();
+  tagUpdated       = output<{id: number, nombre: string, color: string}>();
   checklistToggled = output<ChecklistTogglePayload>();
   checklistItemAdded = output<ChecklistAddPayload>();
   commentAdded     = output<CommentAddPayload>();
@@ -93,6 +94,7 @@ export class ModalDetalleTarjetaComponent extends BaseModalComponent implements 
   showAssigneeSel = signal(false);
   showTagPicker   = signal(false);
   isCreatingTag   = signal(false);
+  editingTagId    = signal<number | null>(null);
   newTagNombre    = signal('');
   newTagColor     = signal('#3b82f6');
   showReminderInput = signal(false);
@@ -155,6 +157,13 @@ export class ModalDetalleTarjetaComponent extends BaseModalComponent implements 
     this.tagToggled.emit({ cardId: this.card().id, tagId: tId, assign: !has });
   }
 
+  editTag(tag: Tag) {
+    this.editingTagId.set(tag.id);
+    this.newTagNombre.set(tag.nombre);
+    this.newTagColor.set(tag.color);
+    this.isCreatingTag.set(true);
+  }
+
   addTag(e?: Event) {
     if (e) {
       e.stopPropagation();
@@ -162,10 +171,23 @@ export class ModalDetalleTarjetaComponent extends BaseModalComponent implements 
     }
     const n = this.newTagNombre().trim();
     if (!n) return;
-    this.tagCreated.emit({ nombre: n, color: this.newTagColor() });
+    
+    if (this.editingTagId()) {
+      this.tagUpdated.emit({ id: this.editingTagId()!, nombre: n, color: this.newTagColor() });
+    } else {
+      this.tagCreated.emit({ nombre: n, color: this.newTagColor() });
+    }
+    
     this.newTagNombre.set('');
     this.newTagColor.set('#3b82f6');
+    this.editingTagId.set(null);
     this.isCreatingTag.set(false);
+  }
+
+  cancelTagForm() {
+    this.isCreatingTag.set(false);
+    this.editingTagId.set(null);
+    this.newTagNombre.set('');
   }
 
   toggleChk(itemId: number) {

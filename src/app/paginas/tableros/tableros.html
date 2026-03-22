@@ -1,6 +1,7 @@
 @if (board()) {
 <div class="app-shell" [class.focus-mode]="ui.focusMode()" [class.sidebar-open]="ui.isSidebarOpen()"
-  [ngClass]="!isImage(board().portada) ? (board().portada || 'c-blue') : ''"
+  [ngClass]="(!isImage(board().portada) && !isHexColor(board().portada)) ? (board().portada || 'c-blue') : ''"
+  [style.backgroundColor]="isHexColor(board().portada) ? board().portada : ''"
   [style.backgroundImage]="isImage(board().portada) ? normalizeUrl(board().portada) : ''" [style.backgroundSize]="'cover'"
   [style.backgroundPosition]="'center'">
 
@@ -239,7 +240,7 @@
   }
 
   <!-- CONTEXT MENU -->
-  <app-context-menu *ngIf="ui.ctx.open()" [x]="ui.ctx.x" [y]="ui.ctx.y" [isArchived]="ui.ctx.isArchived()"
+  <app-context-menu [open]="ui.ctx.open()" [x]="ui.ctx.x()" [y]="ui.ctx.y()" [isArchived]="ui.ctx.isArchived()"
     (action)="ctxAction($event)" (closed)="closeCtx()">
   </app-context-menu>
 
@@ -262,6 +263,7 @@
     [tags]="tags()" [members]="board().miembros || []" [today]="today" [canEdit]="canEdit()" [canComment]="canComment()"
     [boardId]="board().id" (cardUpdated)="onCardUpdated($event)" (cardMoved)="onCardMoved($event)"
     (cardDeleted)="onCardDeleted($event)" (tagToggled)="onTagToggled($event)" (tagCreated)="onTagCreated($event)"
+    (tagUpdated)="onTagUpdated($event)"
     (checklistToggled)="onChecklistToggled($event)" (checklistItemAdded)="onChecklistItemAdded($event)"
     (commentAdded)="onCommentAdded($event)" (closed)="closeDetail()">
   </app-modal-detalle-tarjeta>

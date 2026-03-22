@@ -283,6 +283,7 @@
                 <div class="tag-row" style="display:flex; align-items:center; gap:8px; margin-bottom:6px; cursor:pointer;" (click)="toggleTag(tag.id)">
                   <input type="checkbox" [checked]="cardHasTag(tag.id)" style="accent-color: var(--primary-color, #3b82f6)">
                   <span class="tag-pill" [style.background]="tag.color" [style.color]="'white'">{{ tag.nombre }}</span>
+                  <button class="btn-mini edit" style="margin-left:auto; z-index:2; border:none; background:transparent; font-size:14px; cursor:pointer;" (click)="$event.stopPropagation(); editTag(tag)">✏️</button>
                 </div>
               }
               @if (!tags() || tags().length === 0) {
@@ -302,8 +303,8 @@
                   <input type="text" class="form-input-sm" placeholder="Nombre..." [value]="newTagNombre()" (input)="newTagNombre.set($any($event.target).value)">
                   <div style="display: flex; gap: 8px;">
                     <input type="color" style="height:32px; width:36px; border:none; padding:0; border-radius:4px; background:transparent; cursor:pointer;" [value]="newTagColor()" (input)="newTagColor.set($any($event.target).value)">
-                    <button class="btn-move" style="flex:1;" [disabled]="!newTagNombre()" (click)="addTag($event)">Guardar</button>
-                    <button class="btn-tool-sm" (click)="isCreatingTag.set(false)" style="margin:0;">X</button>
+                    <button class="btn-move" style="flex:1;" [disabled]="!newTagNombre()" (click)="addTag($event)">{{ editingTagId() ? 'Actualizar' : 'Guardar' }}</button>
+                    <button class="btn-tool-sm" (click)="cancelTagForm()" style="margin:0;">X</button>
                   </div>
                 </div>
               }

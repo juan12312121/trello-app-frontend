@@ -1,64 +1,66 @@
 <div class="m-overlay" (click)="closed.emit()">
   <div class="m-box" (click)="$event.stopPropagation()">
     
-    <div class="m-hdr">
-      <div class="m-title-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="title-icon">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-        </svg>
-        <h2 class="m-title">Perfil y Configuración</h2>
-      </div>
-      <button class="btn-close" (click)="closed.emit()">
+    <!-- HEADER CON PORTADA Y AVATAR -->
+    <div class="m-cover">
+      <button class="btn-close-abs" (click)="closed.emit()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
+      
+      <div class="m-avatar">
+        {{ nombre() ? nombre().substring(0,2).toUpperCase() : 'US' }}
+      </div>
     </div>
 
+    <!-- CUERPO PRINCIPAL -->
     <div class="m-body">
       
-      <!-- SECCIÓN: CUENTA -->
-      <div class="m-section">
-        <h3 class="s-title">Mi Cuenta</h3>
-        
-        <div class="form-group">
-          <label>Nombre completo</label>
-          <input type="text" [(ngModel)]="nombre" spellcheck="false" placeholder="Escribe tu nombre...">
-        </div>
-
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" [(ngModel)]="email" spellcheck="false" placeholder="usuario@ejemplo.com">
-        </div>
-
-        <div class="form-group">
-          <label>Nueva contraseña (opcional)</label>
-          <input type="password" [(ngModel)]="password" placeholder="Mínimo 6 caracteres...">
-        </div>
+      <div class="m-head-text">
+        <h2 class="m-title">Perfil y Configuración</h2>
+        <p class="m-subtitle">Administra tu información personal y preferencias de la aplicación.</p>
       </div>
 
-      <!-- SECCIÓN: PREFERENCIAS -->
-      <div class="m-section">
-        <h3 class="s-title">Personalización y Preferencias</h3>
+      <!-- SECCIÓN SECUNDARIA: LAYOUT DE DOS COLUMNAS -->
+      <div class="m-grid">
         
-        <div class="pref-row">
-          <div class="pref-info">
-            <span class="p-lab">Modo Oscuro</span>
-            <span class="p-sub">Alternar rápidamente entre claro y oscuro</span>
+        <!-- COL 1: DATOS PERSONALES -->
+        <div class="m-card">
+          <h3 class="c-title">Mi Cuenta</h3>
+          
+          <div class="form-group floating">
+            <input type="text" [(ngModel)]="nombre" spellcheck="false" placeholder=" ">
+            <label>Nombre Completo</label>
           </div>
-          <button class="btn-toggle" [class.dark]="themeService.currentTheme() !== 'light'" (click)="themeService.toggleTheme()">
-             <div class="t-circle">
-                @if (themeService.currentTheme() !== 'light') {
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                } @else {
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                }
-             </div>
-          </button>
+
+          <div class="form-group floating">
+            <input type="email" [(ngModel)]="email" spellcheck="false" placeholder=" ">
+            <label>Correo Electrónico</label>
+          </div>
+
+          <div class="form-group floating">
+            <input type="password" [(ngModel)]="password" placeholder=" ">
+            <label>Nueva Contraseña <span style="font-weight:400; font-size:11px;">(opcional)</span></label>
+          </div>
         </div>
 
-        <div class="pref-row-v">
-            <div class="pref-info">
-              <span class="p-lab">Temas de color</span>
-              <span class="p-sub">Elige un estilo que se adapte a ti</span>
+        <!-- COL 2: PREFERENCIAS -->
+        <div class="m-card">
+          <h3 class="c-title">Personalización</h3>
+          
+          <div class="pref-item">
+            <div class="pref-text">
+              <strong>Modo Oscuro</strong>
+              <span>Interfaz con menos brillo</span>
+            </div>
+            <button class="btn-toggle" [class.dark]="themeService.currentTheme() !== 'light'" (click)="themeService.toggleTheme()">
+              <div class="t-circle"></div>
+            </button>
+          </div>
+
+          <div class="pref-item-stack">
+            <div class="pref-text">
+              <strong>Color de Énfasis</strong>
+              <span>Escoge tu tonalidad favorita</span>
             </div>
             <div class="theme-grid">
               <button class="theme-opt light" title="Claro" [class.active]="themeService.currentTheme() === 'light'" (click)="themeService.setTheme('light')"></button>
@@ -67,18 +69,20 @@
               <button class="theme-opt emerald" title="Esmeralda" [class.active]="themeService.currentTheme() === 'emerald'" (click)="themeService.setTheme('emerald')"></button>
               <button class="theme-opt rose" title="Sakura" [class.active]="themeService.currentTheme() === 'rose'" (click)="themeService.setTheme('rose')"></button>
             </div>
+          </div>
+
+          <div class="pref-item-stack" style="margin-top:auto;">
+             <div class="pref-text">
+               <strong>Idioma</strong>
+             </div>
+             <select class="pref-select">
+                <option value="es" selected>Español</option>
+                <option value="en">English (Próximamente)</option>
+             </select>
+          </div>
+
         </div>
 
-        <div class="pref-row">
-            <div class="pref-info">
-              <span class="p-lab">Idioma</span>
-              <span class="p-sub">Configuración general de lenguaje</span>
-            </div>
-            <select class="pref-select">
-                <option value="es" selected>Español</option>
-                <option value="en">English (Coming soon)</option>
-            </select>
-        </div>
       </div>
 
       <!-- Feedbacks -->
@@ -94,13 +98,12 @@
             {{ error() }}
         </div>
       }
-
     </div>
 
     <div class="m-footer">
        <button class="btn-cancel" (click)="closed.emit()">Cancelar</button>
        <button class="btn-save" [disabled]="loading()" (click)="save()">
-         {{ loading() ? 'Guardando...' : 'Guardar cambios' }}
+         {{ loading() ? 'Guardando...' : 'Guardar Cambios' }}
        </button>
     </div>
 

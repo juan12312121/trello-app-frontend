@@ -32,7 +32,7 @@ export class ModalAjustesTableroComponent extends BaseModalComponent {
 
   public getInitials = getInitials;
 
-  activeTab = signal<'general' | 'members' | 'tags'>('general');
+  activeTab = signal<'general' | 'members' | 'tags' | 'background'>('general');
 
   // Tag Form
   newTagNombre = signal('');
@@ -116,5 +116,31 @@ export class ModalAjustesTableroComponent extends BaseModalComponent {
     this.editingTagId.set(null);
     this.newTagNombre.set('');
     this.newTagColor.set('#3b82f6');
+  }
+
+  // --- FONDO (BACKGROUND) ---
+  newBgColor = signal('#93c5fd');
+
+  applyBgColor() {
+    if (!this.isAdmin()) return;
+    this.boardService.updateBoard(this.board().id, { portada: this.newBgColor() }).subscribe(() => {
+      this.boardChanged.emit();
+    });
+  }
+
+  applyPredefinedBg(colorClass: string) {
+    if (!this.isAdmin()) return;
+    this.boardService.updateBoard(this.board().id, { portada: colorClass }).subscribe(() => {
+      this.boardChanged.emit();
+    });
+  }
+
+  applyBgImage(event: Event) {
+    if (!this.isAdmin()) return;
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    this.boardService.updateBoardBackground(this.board().id, file).subscribe(() => {
+      this.boardChanged.emit();
+    });
   }
 }

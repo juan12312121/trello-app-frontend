@@ -6,6 +6,7 @@ import { ListService } from '../../core/services/list.service';
 import { CardService } from '../../core/services/card.service';
 import { ReminderService } from '../../core/services/reminder.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { AuthService } from '../../core/services/auth.service';
 import { ModalCrearTablero } from '../modal-crear-tablero/modal-crear-tablero';
 import { normalizeServerUrl, isImage } from '../../core/utils/functions';
 import { environment } from '../../../environments/environment';
@@ -24,6 +25,7 @@ export class VistaTablerosComponent {
   private cardService = inject(CardService);
   private reminderService = inject(ReminderService);
   private notificationService = inject(NotificationService);
+  private authService = inject(AuthService);
 
   public isImage = isImage;
 
@@ -35,16 +37,32 @@ export class VistaTablerosComponent {
 
   showCreateBoard = signal(false);
   activeMenuBoardId = signal<number | null>(null);
+  activeTab = signal<'all' | 'owner' | 'member' | 'archived'>('all');
 
   // Signals para estadísticas centralizadas y filtro
   boards = computed(() => {
     const term = this.boardService.boardSearchQuery().trim().toLowerCase();
-    const all = this.boardService.boards().map(b => {
+    const currentTab = this.activeTab();
+    const user = this.authService.currentUser();
+    
+    let allBoards = this.boardService.boards().map(b => {
       const savedBg = localStorage.getItem(`board_bg_${b.id}`);
       return savedBg ? { ...b, portada: savedBg } : b;
     });
-    if (!term) return all;
-    return all.filter(b => b.nombre.toLowerCase().includes(term));
+
+    if (currentTab === 'archived') {
+       allBoards = allBoards.filter(b => b.archivado);
+    } else {
+       allBoards = allBoards.filter(b => !b.archivado);
+       if (currentTab === 'owner') {
+          allBoards = allBoards.filter(b => b.usuario_propietario_id === user?.id);
+       } else if (currentTab === 'member') {
+          allBoards = allBoards.filter(b => b.usuario_propietario_id !== user?.id);
+       }
+    }
+
+    if (!term) return allBoards;
+    return allBoards.filter(b => b.nombre.toLowerCase().includes(term));
   });
   totalBoards = computed(() => this.boards().length);
   totalLists = computed(() => this.boards().reduce((s, b) => s + (b.total_columnas || 0), 0));
@@ -142,6 +160,22 @@ export class VistaTablerosComponent {
         // Timer expired without undo - perform actual deletion
         this.boardService.deleteBoard(board.id).subscribe();
       }
+    });
+  }
+
+  archiveBoard(board: any, event: Event) {
+    event.stopPropagation();
+    this.activeMenuBoardId.set(null);
+    this.boardService.updateBoard(board.id, { archivado: true }).subscribe(() => {
+      this.notificationService.notify('Tablero archivado correctamente', 'info');
+    });
+  }
+
+  unarchiveBoard(board: any, event: Event) {
+    event.stopPropagation();
+    this.activeMenuBoardId.set(null);
+    this.boardService.updateBoard(board.id, { archivado: false }).subscribe(() => {
+      this.notificationService.notify('Tablero restaurado', 'success');
     });
   }
 

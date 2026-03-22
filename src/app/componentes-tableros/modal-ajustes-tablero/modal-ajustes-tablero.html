@@ -12,6 +12,7 @@
         <button [class.active]="activeTab() === 'general'" (click)="activeTab.set('general')">Información General</button>
         <button [class.active]="activeTab() === 'members'" (click)="activeTab.set('members')">Miembros</button>
         <button [class.active]="activeTab() === 'tags'" (click)="activeTab.set('tags')">Etiquetas</button>
+        <button [class.active]="activeTab() === 'background'" (click)="activeTab.set('background')">Fondo</button>
       </div>
 
       <!-- Content Area -->
@@ -109,6 +110,43 @@
               <div class="no-data">No has creado etiquetas todavía.</div>
             }
           </div>
+        }
+
+        <!-- BACKGROUND -->
+        @if (activeTab() === 'background') {
+          <h3 class="panel-title">Fondo del Tablero</h3>
+          <p class="panel-desc">Elige un color sólido o sube una imagen de fondo.</p>
+          
+          <div class="settings-group">
+            <div class="set-row" style="flex-direction:column; align-items:flex-start; gap:12px;">
+              <strong>Color Sólido (Hexadecimal)</strong>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <input type="color" [value]="newBgColor()" (input)="newBgColor.set($any($event.target).value)" style="height:32px; width:48px; cursor:pointer; border:none; padding:0; background:transparent;">
+                <button class="btn-move" [disabled]="!isAdmin()" (click)="applyBgColor()">Aplicar Color</button>
+              </div>
+            </div>
+            
+            <div class="set-row" style="flex-direction:column; align-items:flex-start; gap:12px; margin-top:20px;">
+              <strong>Imagen de Fondo</strong>
+              <p style="font-size:12px; color:var(--t3); margin:0;">Sube un archivo .jpg o .png para establecerlo como fondo del tablero.</p>
+              <input type="file" accept="image/*" #bgFileInput style="display:none" (change)="applyBgImage($event)">
+              <button class="btn-save-card" [disabled]="!isAdmin()" (click)="bgFileInput.click()">Subir Imagen</button>
+            </div>
+            
+            <div class="set-row" style="flex-direction:column; align-items:flex-start; gap:12px; margin-top:20px;">
+              <strong>Colores predefinidos</strong>
+              <div style="display:flex; gap:8px;">
+                <div style="width:32px;height:32px;background:#93c5fd;border-radius:4px;cursor:pointer;" (click)="applyPredefinedBg('c-blue')" title="Azul"></div>
+                <div style="width:32px;height:32px;background:#a78bfa;border-radius:4px;cursor:pointer;" (click)="applyPredefinedBg('c-purple')" title="Morado"></div>
+                <div style="width:32px;height:32px;background:#34d399;border-radius:4px;cursor:pointer;" (click)="applyPredefinedBg('c-green')" title="Verde"></div>
+                <div style="width:32px;height:32px;background:#fb923c;border-radius:4px;cursor:pointer;" (click)="applyPredefinedBg('c-orange')" title="Naranja"></div>
+                <div style="width:32px;height:32px;background:#f472b6;border-radius:4px;cursor:pointer;" (click)="applyPredefinedBg('c-pink')" title="Rosa"></div>
+              </div>
+            </div>
+          </div>
+          @if (!isAdmin()) {
+            <p style="color:red; font-size:12px; margin-top:20px;">Solo el dueño o administrador del tablero puede modificar el fondo.</p>
+          }
         }
 
       </div>

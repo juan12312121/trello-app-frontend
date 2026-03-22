@@ -45,7 +45,11 @@
             @for (tid of card.tags; track tid) {
               @let tag = getTag(tid);
               @if (tag) {
-                <div class="c-tag" [style.background]="tag.color" [title]="tag.nombre">
+                <div class="c-tag" 
+                     [class.expanded]="tagsExpanded()" 
+                     [style.background]="tag.color" 
+                     [title]="tag.nombre"
+                     (click)="toggleTags($event)">
                   <span class="c-tag-lbl">{{ tag.nombre }}</span>
                 </div>
               }

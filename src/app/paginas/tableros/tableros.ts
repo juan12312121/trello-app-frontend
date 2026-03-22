@@ -105,8 +105,8 @@ export class TablerosComponent implements OnInit, OnDestroy {
     focusMode: signal(false),
     ctx: {
       open: signal(false),
-      x: 0,
-      y: 0,
+      x: signal(0),
+      y: signal(0),
       listId: signal<number | null>(null),
       isArchived: signal(false)
     }
@@ -205,6 +205,7 @@ export class TablerosComponent implements OnInit, OnDestroy {
   // Helper expose
   public getInitials = getInitials;
   public fmtDate = fmtDate;
+  public isHexColor = (val: any) => typeof val === 'string' && val.startsWith('#');
 
   loadListsSilently(boardId: number) {
     this.listService.getLists(boardId).subscribe(res => {
@@ -556,8 +557,8 @@ export class TablerosComponent implements OnInit, OnDestroy {
        return;
     }
 
-    this.ui.ctx.x = e.event.clientX;
-    this.ui.ctx.y = e.event.clientY;
+    this.ui.ctx.x.set(e.event.clientX);
+    this.ui.ctx.y.set(e.event.clientY);
     this.ui.ctx.listId.set(e.listId);
     
     const list = this.getList(e.listId);
@@ -762,6 +763,13 @@ export class TablerosComponent implements OnInit, OnDestroy {
   onTagCreated(e: { nombre: string, color: string }) {
     if (!this.board()) return;
     this.tagService.createTag(this.board().id, e).subscribe(() => {
+      this.loadTags(this.board().id);
+    });
+  }
+
+  onTagUpdated(e: { id: number, nombre: string, color: string }) {
+    if (!this.board()) return;
+    this.tagService.updateTag(this.board().id, e.id, { nombre: e.nombre, color: e.color }).subscribe(() => {
       this.loadTags(this.board().id);
     });
   }

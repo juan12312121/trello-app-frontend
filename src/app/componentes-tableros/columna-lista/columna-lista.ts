@@ -1,4 +1,4 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, input, output, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Lista, Tarjeta, Tag, User } from '../../core/models';
@@ -11,7 +11,7 @@ import { fmtDate } from '../../core/utils/functions';
   templateUrl: './columna-lista.html',
   styleUrl: './columna-lista.css',
 })
-export class ColumnaListaComponent {
+export class ColumnaListaComponent implements OnDestroy {
   list      = input.required<Lista>();
   tags      = input.required<Tag[]>();
   members   = input.required<any[]>(); // Dejamos como any para flexibilidad con tipos del board
@@ -27,6 +27,28 @@ export class ColumnaListaComponent {
 
   inlineVisible = signal(false);
   inlineText    = signal('');
+
+  tagsExpanded = signal(localStorage.getItem('trello_tags_ex') === 'true');
+  
+  private toggleListener = () => {
+    this.tagsExpanded.set(localStorage.getItem('trello_tags_ex') === 'true');
+  };
+
+  constructor() {
+    window.addEventListener('trello_tags_toggled', this.toggleListener);
+  }
+
+  ngOnDestroy() {
+    window.removeEventListener('trello_tags_toggled', this.toggleListener);
+  }
+
+  toggleTags(e: Event) {
+    e.stopPropagation();
+    const isEx = !this.tagsExpanded();
+    this.tagsExpanded.set(isEx);
+    localStorage.setItem('trello_tags_ex', isEx.toString());
+    window.dispatchEvent(new Event('trello_tags_toggled'));
+  }
 
   showInline()  { this.inlineVisible.set(true); }
   hideInline()  { this.inlineVisible.set(false); this.inlineText.set(''); }
