@@ -1,4 +1,4 @@
-import { Component, input, output, signal, OnInit, effect, untracked } from '@angular/core';
+import { Component, input, output, signal, computed, OnInit, effect, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../../environments/environment';
 import { Lista, Tarjeta, Tag } from '../../core/models';
@@ -10,6 +10,8 @@ import { ChecklistService } from '../../core/services/checklist.service';
 import { BoardService } from '../../core/services/board.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { getInitials, fmtDate, fmtTime } from '../../core/utils/functions';
+import { DomSanitizer } from '@angular/platform-browser';
+import { marked } from 'marked';
 
 export interface CardMovedPayload  { cardId: number; targetListId: number; }
 export interface CardUpdatedPayload { 
@@ -66,11 +68,19 @@ export class ModalDetalleTarjetaComponent extends BaseModalComponent implements 
   private checklistService  = inject(ChecklistService);
   private boardService      = inject(BoardService);
   private notifService      = inject(NotificationService);
+  private sanitizer         = inject(DomSanitizer);
 
   protected Math = Math;
 
+  parsedDescription = computed(() => {
+    const desc = this.descripcion();
+    if (!desc) return this.sanitizer.bypassSecurityTrustHtml('');
+    return this.sanitizer.bypassSecurityTrustHtml(marked.parse(desc) as string);
+  });
+
   attachments = signal<any[]>([]);
   reminders   = signal<any[]>([]);
+  isEditingDesc = signal(false);
   private _effect = effect(() => {
     const c = this.card();
     const l = this.list();

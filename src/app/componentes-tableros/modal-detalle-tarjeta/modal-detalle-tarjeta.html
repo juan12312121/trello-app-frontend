@@ -40,17 +40,31 @@
         <div>
 
           <!-- Descripción -->
-          <div class="mc-sec-lbl">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-              <polyline points="14 2 14 8 20 8" />
-            </svg>
-            Descripción
+          <div class="mc-sec-lbl" style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+              Descripción
+            </div>
+            @if (canEdit() && !isEditingDesc()) {
+              <button class="btn-tool-sm" (click)="isEditingDesc.set(true)">✏️ Editar</button>
+            }
           </div>
-          <textarea class="mc-desc" placeholder="Añade una descripción más detallada…" [value]="descripcion()"
-            [readonly]="!canEdit()" (input)="descripcion.set($any($event.target).value)"
-            (blur)="canEdit() ? saveDesc() : null">
-          </textarea>
+
+          @if (isEditingDesc() && canEdit()) {
+            <textarea class="mc-desc" placeholder="Añade una descripción más detallada (puedes usar Markdown)…" [value]="descripcion()"
+              (input)="descripcion.set($any($event.target).value)" 
+              (blur)="isEditingDesc.set(false); saveDesc()" autofocus style="min-height: 120px;">
+            </textarea>
+            <div style="font-size: 11px; color: var(--t3); margin-top: 4px;">Soporta Markdown: **negrita**, *cursiva*, - listas</div>
+          } @else {
+            <div class="mc-desc-preview markdown-body" [innerHTML]="parsedDescription()" 
+                 (click)="canEdit() ? isEditingDesc.set(true) : null"
+                 [style.cursor]="canEdit() ? 'pointer' : 'default'">
+            </div>
+          }
 
           <!-- Checklist -->
           @if (card().checklist) {

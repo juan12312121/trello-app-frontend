@@ -23,6 +23,9 @@ export class TopbarComponent {
   openSettings   = output<void>();
   boardRenamed   = output<string>();
   toggleSidebar  = output<void>();
+  filterChanged  = output<string | null>();
+
+  activeFilter = input<string | null>(null);
 
   private router = inject(Router);
   private reminderService = inject(ReminderService);
@@ -32,6 +35,7 @@ export class TopbarComponent {
   pendingReminders = signal<any[]>([]);
   showNotifs = signal(false);
   showThemeMenu = signal(false);
+  showFilterMenu = signal(false);
 
   ngOnInit() {
     this.loadReminders();
@@ -55,6 +59,12 @@ export class TopbarComponent {
   }
 
   toggleNotifs() { this.showNotifs.set(!this.showNotifs()); }
+  toggleFilters() { this.showFilterMenu.set(!this.showFilterMenu()); }
+
+  setFilter(filter: string | null) {
+     this.filterChanged.emit(filter);
+     this.showFilterMenu.set(false);
+  }
 
   goBack() {
     this.router.navigate(['/dashboard']);

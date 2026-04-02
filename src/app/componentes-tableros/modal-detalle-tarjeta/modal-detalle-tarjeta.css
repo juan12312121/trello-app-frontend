@@ -887,6 +887,56 @@
 .att-act.danger { color: #f43f5e; }
 .att-act.danger:hover { color: #e11d48; }
 
+.mc-action-btn:hover { background: var(--bg-h); }
+.mc-action-btn:active { background: var(--bg-a); transform:scale(0.98); }
+.mc-action-btn.danger { color: #f87171; }
+.mc-action-btn.danger:hover { background: rgba(248,113,113,0.1); }
+
+.mc-desc-preview {
+  background: var(--s2);
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: var(--t2);
+  line-height: 1.5;
+  transition: all 0.2s ease;
+  min-height: 60px;
+}
+.mc-desc-preview:hover {
+  background: var(--bg-h);
+}
+
+.mc-desc-preview.markdown-body ul {
+  padding-left: 20px;
+  list-style-type: disc;
+  margin-block-start: 8px;
+  margin-block-end: 8px;
+}
+.mc-desc-preview.markdown-body ol {
+  padding-left: 20px;
+  list-style-type: decimal;
+  margin-block-start: 8px;
+  margin-block-end: 8px;
+}
+.mc-desc-preview.markdown-body p { margin-bottom: 8px; }
+.mc-desc-preview.markdown-body p:last-child { margin-bottom: 0; }
+.mc-desc-preview.markdown-body a { color: var(--primary-color, #3b82f6); text-decoration: none; }
+.mc-desc-preview.markdown-body a:hover { text-decoration: underline; }
+.mc-desc-preview.markdown-body strong { font-weight: 600; color: var(--t1); }
+.mc-desc-preview.markdown-body h1, .mc-desc-preview.markdown-body h2, .mc-desc-preview.markdown-body h3 {
+  font-weight: 600;
+  color: var(--t1);
+  margin-top: 12px;
+  margin-bottom: 8px;
+}
+.mc-desc-preview.markdown-body h1 { font-size: 1.5em; border-bottom: 1px solid var(--bd2); padding-bottom: 4px; }
+.mc-desc-preview.markdown-body h2 { font-size: 1.25em; border-bottom: 1px solid var(--bd2); padding-bottom: 4px; }
+.mc-desc-preview.markdown-body h3 { font-size: 1.1em; }
+.mc-desc-preview.markdown-body code { background: rgba(0,0,0,0.1); padding: 2px 4px; border-radius: 4px; font-family: monospace; font-size: 0.9em; }
+:root[data-theme='dark'] .mc-desc-preview.markdown-body code { background: rgba(255,255,255,0.1); }
+.mc-desc-preview.markdown-body pre { background: var(--bg); padding: 10px; border-radius: 6px; overflow-x: auto; margin-top:8px; margin-bottom:8px; }
+.mc-desc-preview.markdown-body pre code { background: transparent; padding: 0; }
+.mc-desc-preview.markdown-body blockquote { border-left: 4px solid var(--bd2); padding-left: 12px; color: var(--t3); margin-left: 0; }
+
 /* Recordatorios */
 .rem-list {
   display: flex;

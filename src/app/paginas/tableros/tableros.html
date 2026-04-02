@@ -26,7 +26,8 @@
     <!-- TOPBAR (incluye cover-stripe) -->
     <app-topbar [board]="board()" [isAdmin]="isAdmin()" [canEdit]="canEdit()" (openInvite)="openInvite()"
       (openCreateCard)="openCreateCard(null)" (openSettings)="ui.showSettings.set(true)"
-      (boardRenamed)="board().nombre = $event" (toggleSidebar)="toggleSidebar()">
+      (boardRenamed)="board().nombre = $event" (toggleSidebar)="toggleSidebar()"
+      [activeFilter]="filterBy()" (filterChanged)="onFilterChanged($event)">
     </app-topbar>
 
     <!-- CHAT TOGGLE BUTTON -->

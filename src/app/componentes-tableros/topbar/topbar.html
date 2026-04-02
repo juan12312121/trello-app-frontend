@@ -42,11 +42,32 @@
 
     <div class="tb-sep"></div>
 
-    <button class="btn-icon" title="Filtrar">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-      </svg>
-    </button>
+    <!-- Filtros Dropdown -->
+    <div class="theme-dropdown-wrap">
+      <button class="btn-icon" [class.active]="activeFilter()" title="Filtrar" (click)="toggleFilters()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+      </button>
+
+      @if (showFilterMenu()) {
+        <div class="theme-menu filter-menu" (click)="showFilterMenu.set(false)" style="right: 0; left: auto; top: calc(100% + 5px);">
+          <div class="nd-hdr" style="padding: 10px; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.1);">Filtros rápidos</div>
+          <button class="theme-item" (click)="setFilter(null)" [class.active]="activeFilter() === null">
+            🌌 Todas las tarjetas
+          </button>
+          <button class="theme-item" (click)="setFilter('my-tasks')" [class.active]="activeFilter() === 'my-tasks'">
+            🙋 Mis Tareas
+          </button>
+          <button class="theme-item" (click)="setFilter('overdue')" [class.active]="activeFilter() === 'overdue'">
+            ⏰ Vencidas
+          </button>
+          <button class="theme-item" (click)="setFilter('attachments')" [class.active]="activeFilter() === 'attachments'">
+            📎 Con Adjuntos
+          </button>
+        </div>
+      }
+    </div>
     <!-- Theme Selector Dropdown -->
     <div class="theme-dropdown-wrap">
       <button class="btn-theme-selector" (click)="showThemeMenu.set(!showThemeMenu())">
