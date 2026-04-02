@@ -228,11 +228,53 @@ export class ModalDetalleTarjetaComponent extends BaseModalComponent implements 
     if (e.key === 'Escape') { this.showChkInput.set(false); this.newChkItem.set(''); }
   }
 
+  // --- MENCIONES EN COMENTARIOS ---
+  showMentions = signal(false);
+  mentionSearch = signal('');
+
+  filteredMembers = computed(() => {
+    const term = this.mentionSearch().toLowerCase();
+    return this.members().filter(m => m.nombre.toLowerCase().includes(term) || m.email.toLowerCase().includes(term));
+  });
+
+  onCommentInput(e: any) {
+    const val = e.target.value;
+    this.newComment.set(val);
+    
+    // Básica detección de arroba justo al escribir
+    const match = val.match(/@(\w*)$/);
+    if (match) {
+      this.showMentions.set(true);
+      this.mentionSearch.set(match[1]);
+    } else {
+      this.showMentions.set(false);
+    }
+  }
+
+  selectMention(mem: any) {
+    const val = this.newComment();
+    // Elimina espacios en el nombre para una mención limpia
+    const nameMention = mem.nombre.replace(/\s+/g, '');
+    const newVal = val.replace(/@(\w*)$/, `@${nameMention} `);
+    
+    this.newComment.set(newVal);
+    this.showMentions.set(false);
+  }
+
+  parseCommentText(text: string) {
+    if (!text) return '';
+    // Mapeamos temporalmente el safe html para evitar inyecciones 
+    const isEncoded = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    // Pinta las menciones (todo lo que arranque en arroba) de azul
+    return isEncoded.replace(/@(\w+)/g, '<span class="mention" style="color:var(--primary-color, #3b82f6); font-weight:600; background:rgba(59,130,246,0.1); padding:0 4px; border-radius:4px; margin:0 2px;">@$1</span>');
+  }
+
   submitComment() {
     const t = this.newComment().trim();
     if (!t) return;
     this.commentAdded.emit({ cardId: this.card().id, texto: t });
     this.newComment.set('');
+    this.showMentions.set(false);
   }
 
   moveCard() {
