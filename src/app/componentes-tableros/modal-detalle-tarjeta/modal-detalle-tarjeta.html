@@ -2,8 +2,17 @@
   <div class="modal-card" (click)="$event.stopPropagation()">
     <div class="mc-body">
 
+      <!-- Portada -->
+      @if (card().portada) {
+        <div class="mc-cover-full" 
+             [style.background]="card().portada?.startsWith('http') || card().portada?.startsWith('data:') ? 'url(' + card().portada + ') center/cover' : 
+                                ((card().portada?.startsWith('#') || card().portada?.startsWith('rgb')) ? card().portada : 'var(--' + card().portada?.replace('c-', 'color-') + ', ' + card().portada + ')')"
+             style="height: 140px; border-radius: 12px 12px 0 0; width: 100%; position: relative;">
+        </div>
+      }
+
       <!-- Header: icono + título editable + cerrar -->
-      <div class="mc-hdr">
+      <div class="mc-hdr" [style.padding-top]="card().portada ? '24px' : '24px'">
         <div class="mc-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <rect x="2" y="2" width="20" height="20" rx="3" ry="3" />
@@ -375,6 +384,30 @@
             </svg>
             Etiquetas
           </button>
+
+          <button class="mc-action-btn" (click)="showCoverPicker.set(!showCoverPicker())">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <line x1="3" y1="9" x2="21" y2="9"/>
+            </svg>
+            Portada
+          </button>
+
+          @if (showCoverPicker()) {
+            <div class="tag-picker" style="background:var(--s2); padding:10px; border-radius:12px; margin-bottom:10px; border:1px solid var(--bd2); box-shadow: var(--sh-sm);">
+              <div style="font-size:12px; font-weight:600; margin-bottom:8px; color:var(--t2);">Color de Portada</div>
+              <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <div style="width:32px;height:32px;background:#93c5fd;border-radius:4px;cursor:pointer;" (click)="setCover('#93c5fd')" title="Azul"></div>
+                <div style="width:32px;height:32px;background:#a78bfa;border-radius:4px;cursor:pointer;" (click)="setCover('#a78bfa')" title="Morado"></div>
+                <div style="width:32px;height:32px;background:#34d399;border-radius:4px;cursor:pointer;" (click)="setCover('#34d399')" title="Verde"></div>
+                <div style="width:32px;height:32px;background:#fb923c;border-radius:4px;cursor:pointer;" (click)="setCover('#fb923c')" title="Naranja"></div>
+                <div style="width:32px;height:32px;background:#f472b6;border-radius:4px;cursor:pointer;" (click)="setCover('#f472b6')" title="Rosa"></div>
+                <div style="width:32px;height:32px;background:#f87171;border-radius:4px;cursor:pointer;" (click)="setCover('#f87171')" title="Rojo"></div>
+                <div style="width:32px;height:32px;background:#94a3b8;border-radius:4px;cursor:pointer;" (click)="setCover('#94a3b8')" title="Gris"></div>
+              </div>
+              <button class="btn-tool-sm" style="margin-top:10px; width:100%;" (click)="setCover(null)">Quitar Portada</button>
+            </div>
+          }
 
           <button class="mc-action-btn" (click)="onAddAttachment()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

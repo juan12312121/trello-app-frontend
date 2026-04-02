@@ -11,6 +11,7 @@ export interface Tarjeta {
   fecha_vencimiento: string | null;
   usuario_asignado_id: number | null;
   completada: boolean;
+  portada?: string | null;
   fecha_creacion?: string;
   fecha_actualizacion?: string;
   tags: number[]; // Las vistas esperan IDs habitualmente

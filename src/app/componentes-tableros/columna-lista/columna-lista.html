@@ -39,6 +39,16 @@
         
         <div class="card-placeholder" *cdkDragPlaceholder></div>
 
+        <!-- Portada de Tarjeta (Cover) -->
+        @if (card.portada) {
+          <div class="card-cover" 
+               [style.background]="card.portada.startsWith('http') || card.portada.startsWith('data:') ? 'url(' + card.portada + ') center/cover' : 
+                                  ((card.portada.startsWith('#') || card.portada.startsWith('rgb')) ? card.portada : 'var(--' + card.portada.replace('c-', 'color-') + ', ' + card.portada + ')')"
+               [style.height.px]="card.portada.startsWith('http') || card.portada.startsWith('data') ? 120 : 32"
+               style="margin: -10px -10px 10px -10px; border-radius: 8px 8px 0 0; width: calc(100% + 20px);">
+          </div>
+        }
+
         <!-- Tags -->
         @if (card.tags && card.tags.length > 0) {
           <div class="card-tags">

@@ -24,6 +24,7 @@ export interface CardUpdatedPayload {
   tiempo_estimado?: number;
   tiempo_dedicado?: number;
   completada?: boolean;
+  portada?: string | null;
 }
 export interface ChecklistTogglePayload { cardId: number; checklistId: number; itemId: number; }
 export interface ChecklistAddPayload    { cardId: number; checklistId: number; texto: string; }
@@ -103,6 +104,7 @@ export class ModalDetalleTarjetaComponent extends BaseModalComponent implements 
 
   showAssigneeSel = signal(false);
   showTagPicker   = signal(false);
+  showCoverPicker = signal(false);
   isCreatingTag   = signal(false);
   editingTagId    = signal<number | null>(null);
   newTagNombre    = signal('');
@@ -245,6 +247,12 @@ export class ModalDetalleTarjetaComponent extends BaseModalComponent implements 
     if (confirm) {
       this.cardDeleted.emit(this.card().id);
     }
+  }
+
+  setCover(color: string | null) {
+    if (!this.canEdit()) return;
+    this.cardUpdated.emit({ cardId: this.card().id, portada: color });
+    this.showCoverPicker.set(false);
   }
 
   onAssigneeChange(e: any) {
