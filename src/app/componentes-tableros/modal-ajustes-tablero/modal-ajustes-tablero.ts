@@ -143,4 +143,42 @@ export class ModalAjustesTableroComponent extends BaseModalComponent {
       this.boardChanged.emit();
     });
   }
+  // --- UNSPLASH ---
+  unsplashQuery = signal('');
+  unsplashPhotos = signal<any[]>([]);
+  unsplashLoading = signal(false);
+  unsplashError = signal<string | null>(null);
+
+  searchUnsplash() {
+    if (!this.unsplashQuery().trim()) return;
+    this.unsplashLoading.set(true);
+    this.unsplashError.set(null);
+
+    // Documentación: Necesitarás poner un Client ID válido aquí. Si no tienes uno, créalo gratis en unsplash.com/developers
+    const UNSPLASH_CLIENT_ID = 'TU_UNSPLASH_CLIENT_ID_AQUI';
+
+    fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(this.unsplashQuery())}&per_page=9&client_id=${UNSPLASH_CLIENT_ID}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Credenciales inválidas o error de API. Asegúrate de poner tu Client ID.');
+        return res.json();
+      })
+      .then(data => {
+        this.unsplashPhotos.set(data.results || []);
+        if (data.results.length === 0) this.unsplashError.set('No se encontraron imágenes.');
+      })
+      .catch(err => {
+        this.unsplashError.set(err.message);
+      })
+      .finally(() => {
+        this.unsplashLoading.set(false);
+      });
+  }
+
+  applyUnsplashBg(url: string) {
+    if (!this.isAdmin()) return;
+    // Guardamos la URL regular como portada (es texto directo)
+    this.boardService.updateBoard(this.board().id, { portada: url }).subscribe(() => {
+      this.boardChanged.emit();
+    });
+  }
 }

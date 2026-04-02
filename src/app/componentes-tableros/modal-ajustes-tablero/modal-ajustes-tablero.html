@@ -143,6 +143,32 @@
                 <div style="width:32px;height:32px;background:#f472b6;border-radius:4px;cursor:pointer;" (click)="applyPredefinedBg('c-pink')" title="Rosa"></div>
               </div>
             </div>
+
+            <!-- UNSPLASH GALLERY -->
+            <div class="set-row" style="flex-direction:column; align-items:flex-start; gap:12px; margin-top:20px; border-top: 1px solid var(--bd2); padding-top: 20px;">
+              <strong>Galería de Unsplash 🏔️</strong>
+              <p style="font-size:12px; color:var(--t3); margin:0;">Busca miles de fondos gratuitos en alta resolución.</p>
+              
+              <div style="display:flex; gap:8px; width: 100%;">
+                <input type="text" class="tf-input" style="flex:1;" placeholder="Ej: space, nature, minimal..." 
+                  [value]="unsplashQuery()" (input)="unsplashQuery.set($any($event.target).value)" (keydown.enter)="searchUnsplash()">
+                <button class="btn-move" (click)="searchUnsplash()">Buscar</button>
+              </div>
+
+              @if (unsplashLoading()) {
+                <div class="spinner" style="margin: 20px auto;"></div>
+              } @else if (unsplashPhotos().length > 0) {
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; margin-top: 10px;">
+                  @for (photo of unsplashPhotos(); track photo.id) {
+                    <div style="position:relative; width: 100%; padding-bottom: 60%; cursor:pointer; border-radius:6px; overflow:hidden;" (click)="applyUnsplashBg(photo.urls.regular)">
+                      <img [src]="photo.urls.small" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    </div>
+                  }
+                </div>
+              } @else if (unsplashError()) {
+                <div style="color: #f87171; font-size: 13px; margin-top:10px;">{{ unsplashError() }}</div>
+              }
+            </div>
           </div>
           @if (!isAdmin()) {
             <p style="color:red; font-size:12px; margin-top:20px;">Solo el dueño o administrador del tablero puede modificar el fondo.</p>
