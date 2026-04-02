@@ -169,11 +169,23 @@
       <div class="analytics-header">
         <div style="display:flex; justify-content:space-between; align-items:flex-start;">
           <div>
-            <h2>📊 Reportes y Analíticas</h2>
+            <h2 style="display:flex; align-items:center; gap:8px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:24px;height:24px;">
+                <line x1="18" y1="20" x2="18" y2="10"/>
+                <line x1="12" y1="20" x2="12" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="14"/>
+              </svg>
+              Reportes y Analíticas
+            </h2>
             <p>Visión general del progreso y carga de trabajo del equipo.</p>
           </div>
-          <button class="btn-move" (click)="exportToCSV()" style="padding: 10px 20px; font-weight: 700;">
-            📥 Exportar CSV
+          <button class="btn-move" (click)="exportToCSV()" style="padding: 10px 20px; font-weight: 700; display:flex; align-items:center; gap:8px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Exportar CSV
           </button>
         </div>
       </div>
@@ -222,7 +234,13 @@
               <div class="member-stat-row">
                 <span class="ms-name">{{ m.name }}</span>
                 <span class="ms-data"><b>{{ m.completed }}/{{ m.total }}</b> tareas</span>
-                <span class="ms-time">⏱ {{ m.time }}h registradas</span>
+                <span class="ms-time" style="display:flex; align-items:center; gap:4px;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  {{ m.time }}h registradas
+                </span>
               </div>
             }
           </div>
