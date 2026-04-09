@@ -12,6 +12,7 @@ export class ContextMenu {
   x    = input<number>(0);
   y    = input<number>(0);
   isArchived = input<boolean>(false);
+  type = input<'list' | 'card'>('list');
 
   action = output<string>();
   closed = output<void>();

@@ -30,8 +30,11 @@
     <!-- Stack de avatares -->
     <div class="m-stack">
       @for (m of board().miembros; track m.id) {
-        <div class="m-av" [style.background]="m.color" [title]="m.nombre">
+        <div class="m-av" [style.background]="m.color" [title]="m.nombre" style="position:relative;">
           {{ m.initials }}
+          @if (isActiveUser(m.id)) {
+            <span class="active-dot" style="position:absolute; bottom:-1px; right:-1px; width:11px; height:11px; background:#10b981; border:2px solid var(--surface); border-radius:50%; box-shadow: 0 0 4px rgba(16, 185, 129, 0.5);"></span>
+          }
         </div>
       }
     </div>

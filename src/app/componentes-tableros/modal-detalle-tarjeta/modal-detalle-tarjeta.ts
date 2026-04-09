@@ -155,6 +155,27 @@ export class ModalDetalleTarjetaComponent extends BaseModalComponent implements 
     this.cardUpdated.emit({ cardId: this.card().id, descripcion: this.descripcion().trim() });
   }
 
+  insertMarkdown(prefix: string, suffix: string = '') {
+    const textarea = document.querySelector('.mc-desc') as HTMLTextAreaElement;
+    if (!textarea) {
+      // Fallback
+      this.descripcion.update(d => d + `\n${prefix}texto${suffix}`);
+      return;
+    }
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = this.descripcion();
+    const selected = text.substring(start, end) || 'texto';
+    const before = text.substring(0, start);
+    const after = text.substring(end);
+    this.descripcion.set(`${before}${prefix}${selected}${suffix}${after}`);
+    
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + prefix.length, start + prefix.length + selected.length);
+    }, 0);
+  }
+
   saveCard() {
     this.saveDesc();
     this.closed.emit();

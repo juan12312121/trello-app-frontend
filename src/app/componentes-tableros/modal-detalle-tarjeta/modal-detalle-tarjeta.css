@@ -506,37 +506,50 @@
 .cmt-row {
   display: flex;
   gap: 12px;
-  align-items: center;
+  align-items: flex-start;
   margin-top: 24px;
-  padding: 10px;
+}
+
+.cmt-compose {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
   background: var(--s2);
-  border-radius: var(--r-xl);
   border: 1px solid var(--bd2);
+  border-radius: var(--r-xl);
+  transition: all 0.2s var(--ease);
+}
+
+.cmt-compose:focus-within {
+  border-color: var(--blue);
+  background: var(--surface);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* or var(--sh-focus) */
 }
 
 .cmt-input {
-  flex: 1;
-  padding: 10px 14px;
-  border: 1px solid var(--bd2);
-  border-radius: var(--r-lg);
+  width: 100%;
+  padding: 12px 14px;
+  border: none;
+  background: transparent;
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
   font-family: 'DM Sans', sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--t1);
-  background: var(--surface);
   outline: none;
   resize: none;
-  transition: all 0.2s var(--ease);
-  min-height: 40px;
-  display: flex;
-  align-items: center;
+  min-height: 60px;
+  display: block;
   box-sizing: border-box;
 }
 
-.cmt-input:focus {
-  border-color: var(--blue);
-  background: var(--surface);
-  box-shadow: var(--sh-focus);
+.cmt-acts {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 12px;
 }
+
+
 
 .btn-send {
   padding: 8px 12px;

@@ -20,7 +20,7 @@ export class ColumnaListaComponent implements OnDestroy {
 
   cardClicked     = output<number>();
   openCreateCard  = output<number>();
-  ctxMenu         = output<{ event: MouseEvent; listId: number }>();
+  ctxMenu         = output<{ event: MouseEvent; listId: number; cardId?: number }>();
   listRenamed     = output<{ listId: number; nombre: string }>();
 
   cardDropped = output<{ event: CdkDragDrop<Tarjeta[]>, listId: number }>();

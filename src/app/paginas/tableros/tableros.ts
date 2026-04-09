@@ -91,6 +91,7 @@ export class TablerosComponent implements OnInit, OnDestroy {
   tags = signal<Tag[]>([]);
   activity = signal<any[]>([]);
   otherBoards = signal<any[]>([]);
+  activeUsers = signal<any[]>([]); // New list of users currently connected to the board
   readonly today = new Date().toISOString().split('T')[0];
 
   // UI State
@@ -107,7 +108,9 @@ export class TablerosComponent implements OnInit, OnDestroy {
       open: signal(false),
       x: signal(0),
       y: signal(0),
+      type: signal<'list' | 'card'>('list'),
       listId: signal<number | null>(null),
+      cardId: signal<number | null>(null),
       isArchived: signal(false)
     }
   };
@@ -177,6 +180,11 @@ export class TablerosComponent implements OnInit, OnDestroy {
     // Escuchamos cambios de fondo en tiempo real
     this.socket.on('board:bg_changed', (data: { portada: string }) => {
       this.board.update(b => b ? { ...b, portada: data.portada } : b);
+    });
+
+    // Escuchamos presencia en vivo
+    this.socket.on('presence_update', (data: { activeUsers: any[] }) => {
+      this.activeUsers.set(data.activeUsers || []);
     });
   }
 
@@ -550,12 +558,12 @@ export class TablerosComponent implements OnInit, OnDestroy {
   }
 
   // ── Context menu ───────────────────────────────────────────────────
-  openCtx(e: { event: MouseEvent; listId: number }) {
+  openCtx(e: { event: MouseEvent; listId: number; cardId?: number }) {
     e.event.preventDefault();
     e.event.stopPropagation();
     
-    // Toggle behavior: Close if already open for this list
-    if (this.ui.ctx.open() && this.ui.ctx.listId() === e.listId) {
+    // Toggle behavior: Close if already open for this list/card
+    if (this.ui.ctx.open() && this.ui.ctx.listId() === e.listId && this.ui.ctx.cardId() === (e.cardId ?? null)) {
        this.closeCtx();
        return;
     }
@@ -564,8 +572,16 @@ export class TablerosComponent implements OnInit, OnDestroy {
     this.ui.ctx.y.set(e.event.clientY);
     this.ui.ctx.listId.set(e.listId);
     
-    const list = this.getList(e.listId);
-    this.ui.ctx.isArchived.set(list?.archivada || false);
+    if (e.cardId) {
+      this.ui.ctx.type.set('card');
+      this.ui.ctx.cardId.set(e.cardId);
+      this.ui.ctx.isArchived.set(false);
+    } else {
+      this.ui.ctx.type.set('list');
+      this.ui.ctx.cardId.set(null);
+      const list = this.getList(e.listId);
+      this.ui.ctx.isArchived.set(list?.archivada || false);
+    }
     
     this.ui.ctx.open.set(true);
   }
@@ -574,6 +590,20 @@ export class TablerosComponent implements OnInit, OnDestroy {
 
   ctxAction(action: string) {
     this.ui.ctx.open.set(false);
+    
+    if (this.ui.ctx.type() === 'card') {
+      const cardId = this.ui.ctx.cardId();
+      if (cardId === null) return;
+      if (action === 'openCard') {
+        this.openDetail(cardId);
+      } else if (action === 'deleteCard') {
+        this.onCardDeleted(cardId);
+      } else if (action === 'markDone') {
+        this.onCardUpdated({ cardId, completada: true });
+      }
+      return;
+    }
+
     const listId = this.ui.ctx.listId();
     if (listId === null || !this.board()) return;
 

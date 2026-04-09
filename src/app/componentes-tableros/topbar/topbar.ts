@@ -17,6 +17,7 @@ export class TopbarComponent {
   board = input.required<Board>();
   canEdit = input<boolean>(true);
   isAdmin = input<boolean>(true);
+  activeUsers = input<any[]>([]);
 
   openInvite     = output<void>();
   openCreateCard = output<void>();
@@ -41,6 +42,11 @@ export class TopbarComponent {
     this.loadReminders();
     // Poll cada minuto
     setInterval(() => this.loadReminders(), 60000);
+  }
+
+  isActiveUser(id: number): boolean {
+    // Si activeUsers es array de objetos con userId, buscar por ID.
+    return this.activeUsers().some(u => u.userId === id || u.id === id || u === id);
   }
 
   loadReminders() {

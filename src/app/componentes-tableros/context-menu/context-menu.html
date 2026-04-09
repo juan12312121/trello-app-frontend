@@ -5,49 +5,75 @@
     [style.left.px]="x()"
     (click)="$event.stopPropagation()">
 
-    <button class="ctx-item" (click)="action.emit('rename'); closed.emit()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-      </svg>
-      Renombrar lista
-    </button>
+    @if (type() === 'list') {
+      <button class="ctx-item" (click)="action.emit('rename'); closed.emit()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+        Renombrar lista
+      </button>
+  
+      <button class="ctx-item" (click)="action.emit('addCard'); closed.emit()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Agregar tarjeta
+      </button>
+  
+      <button class="ctx-item" (click)="action.emit('sort'); closed.emit()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"/>
+          <line x1="8" y1="12" x2="21" y2="12"/>
+          <line x1="8" y1="18" x2="21" y2="18"/>
+        </svg>
+        Ordenar por fecha
+      </button>
+  
+      <div class="ctx-sep"></div>
+  
+      <button class="ctx-item" (click)="isArchived() ? action.emit('unarchive') : action.emit('archive'); closed.emit()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="21 8 21 21 3 21 3 8"/>
+          <rect x="1" y="3" width="22" height="5"/>
+        </svg>
+        {{ isArchived() ? 'Desarchivar lista' : 'Archivar lista' }}
+      </button>
+  
+      <button class="ctx-item danger" (click)="action.emit('delete'); closed.emit()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+          <path d="M10 11v6M14 11v6"/>
+        </svg>
+        Eliminar lista
+      </button>
+    } @else {
+      <button class="ctx-item" (click)="action.emit('openCard'); closed.emit()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+        </svg>
+        Abrir tarjeta
+      </button>
 
-    <button class="ctx-item" (click)="action.emit('addCard'); closed.emit()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="12" y1="5" x2="12" y2="19"/>
-        <line x1="5" y1="12" x2="19" y2="12"/>
-      </svg>
-      Agregar tarjeta
-    </button>
+      <button class="ctx-item" (click)="action.emit('markDone'); closed.emit()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        Marcar completada
+      </button>
 
-    <button class="ctx-item" (click)="action.emit('sort'); closed.emit()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="8" y1="6" x2="21" y2="6"/>
-        <line x1="8" y1="12" x2="21" y2="12"/>
-        <line x1="8" y1="18" x2="21" y2="18"/>
-      </svg>
-      Ordenar por fecha
-    </button>
+      <div class="ctx-sep"></div>
 
-    <div class="ctx-sep"></div>
-
-    <button class="ctx-item" (click)="isArchived() ? action.emit('unarchive') : action.emit('archive'); closed.emit()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="21 8 21 21 3 21 3 8"/>
-        <rect x="1" y="3" width="22" height="5"/>
-      </svg>
-      {{ isArchived() ? 'Desarchivar lista' : 'Archivar lista' }}
-    </button>
-
-    <button class="ctx-item danger" (click)="action.emit('delete'); closed.emit()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="3 6 5 6 21 6"/>
-        <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
-        <path d="M10 11v6M14 11v6"/>
-      </svg>
-      Eliminar lista
-    </button>
+      <button class="ctx-item danger" (click)="action.emit('deleteCard'); closed.emit()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+        Eliminar tarjeta
+      </button>
+    }
 
   </div>
 }

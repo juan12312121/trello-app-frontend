@@ -35,7 +35,8 @@
           [cdkDragData]="card"
           [cdkDragDisabled]="!canEdit()"
           [attr.data-card-id]="card.id"
-          (click)="cardClicked.emit(card.id)">
+          (click)="cardClicked.emit(card.id)"
+          (contextmenu)="ctxMenu.emit({ event: $event, listId: list().id, cardId: card.id })">
         
         <div class="card-placeholder" *cdkDragPlaceholder></div>
 

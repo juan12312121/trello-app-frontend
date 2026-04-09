@@ -24,7 +24,7 @@
   <div class="main">
 
     <!-- TOPBAR (incluye cover-stripe) -->
-    <app-topbar [board]="board()" [isAdmin]="isAdmin()" [canEdit]="canEdit()" (openInvite)="openInvite()"
+    <app-topbar [board]="board()" [isAdmin]="isAdmin()" [canEdit]="canEdit()" [activeUsers]="activeUsers()" (openInvite)="openInvite()"
       (openCreateCard)="openCreateCard(null)" (openSettings)="ui.showSettings.set(true)"
       (boardRenamed)="board().nombre = $event" (toggleSidebar)="toggleSidebar()"
       [activeFilter]="filterBy()" (filterChanged)="onFilterChanged($event)">
@@ -259,7 +259,7 @@
   }
 
   <!-- CONTEXT MENU -->
-  <app-context-menu [open]="ui.ctx.open()" [x]="ui.ctx.x()" [y]="ui.ctx.y()" [isArchived]="ui.ctx.isArchived()"
+  <app-context-menu [open]="ui.ctx.open()" [x]="ui.ctx.x()" [y]="ui.ctx.y()" [isArchived]="ui.ctx.isArchived()" [type]="ui.ctx.type()"
     (action)="ctxAction($event)" (closed)="closeCtx()">
   </app-context-menu>
 
@@ -307,8 +307,59 @@
 
 </div>
 } @else {
-<div class="loading-state">
-  <div class="spinner"></div>
-  Cargando tablero...
+<div class="skeleton-board">
+  <div class="sk-sidebar skeleton-box"></div>
+  <div class="sk-main">
+    <div class="sk-topbar skeleton-box"></div>
+    <div class="sk-canvas">
+      <!-- Columna 1 -->
+      <div class="sk-column">
+        <div class="sk-col-header skeleton-box"></div>
+        <div class="sk-card">
+          <div class="sk-tag skeleton-box"></div>
+          <div class="sk-text skeleton-box"></div>
+          <div class="sk-text short skeleton-box"></div>
+          <div class="sk-footer">
+            <div class="sk-icon skeleton-box"></div>
+            <div class="sk-avatar skeleton-box"></div>
+          </div>
+        </div>
+        <div class="sk-card">
+          <div class="sk-text skeleton-box" style="margin-top:0"></div>
+          <div class="sk-text short skeleton-box"></div>
+        </div>
+        <div class="sk-card">
+           <div class="sk-cover skeleton-box"></div>
+           <div class="sk-text skeleton-box"></div>
+           <div class="sk-text short skeleton-box"></div>
+        </div>
+      </div>
+      <!-- Columna 2 -->
+      <div class="sk-column">
+        <div class="sk-col-header skeleton-box"></div>
+        <div class="sk-card">
+          <div class="sk-text skeleton-box" style="margin-top:0"></div>
+          <div class="sk-text short skeleton-box"></div>
+        </div>
+      </div>
+      <!-- Columna 3 -->
+      <div class="sk-column">
+        <div class="sk-col-header skeleton-box"></div>
+        <div class="sk-card">
+          <div class="sk-tag skeleton-box"></div>
+          <div class="sk-tag skeleton-box" style="width: 30%"></div>
+          <div class="sk-text skeleton-box"></div>
+        </div>
+        <div class="sk-card">
+          <div class="sk-text skeleton-box" style="margin-top:0"></div>
+          <div class="sk-text skeleton-box"></div>
+          <div class="sk-footer">
+            <div class="sk-icon skeleton-box"></div>
+            <div class="sk-avatar skeleton-box"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 }

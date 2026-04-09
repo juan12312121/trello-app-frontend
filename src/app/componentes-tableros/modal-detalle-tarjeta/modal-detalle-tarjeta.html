@@ -69,11 +69,22 @@
           </div>
 
           @if (isEditingDesc() && canEdit()) {
+            <div class="md-toolbar" style="display:flex; gap:6px; margin-bottom:8px; padding:6px; background:var(--s2); border:1px solid var(--bd2); border-radius:8px;">
+              <button class="btn-tool-sm" (click)="insertMarkdown('**', '**')" title="Negrita" style="margin:0;"><strong>B</strong></button>
+              <button class="btn-tool-sm" (click)="insertMarkdown('*', '*')" title="Cursiva" style="margin:0;"><em>I</em></button>
+              <button class="btn-tool-sm" (click)="insertMarkdown('~~', '~~')" title="Tachado" style="margin:0;"><del>S</del></button>
+              <button class="btn-tool-sm" (click)="insertMarkdown('\n- ')" title="Lista" style="margin:0;">• List</button>
+              <button class="btn-tool-sm" (click)="insertMarkdown('[', '](url)')" title="Enlace" style="margin:0;">🔗</button>
+              <button class="btn-tool-sm" (click)="insertMarkdown('\n```\n', '\n```')" title="Código" style="margin:0;">&lt;/&gt;</button>
+              <div style="flex:1;"></div>
+              <button class="btn-send" (click)="isEditingDesc.set(false); saveDesc()" style="padding:4px 10px; font-size:0.75rem;">Guardar</button>
+              <button class="btn-tool-sm" (click)="isEditingDesc.set(false)" style="margin:0;">Cancelar</button>
+            </div>
             <textarea class="mc-desc" placeholder="Añade una descripción más detallada (puedes usar Markdown)…" [value]="descripcion()"
               (input)="descripcion.set($any($event.target).value)" 
-              (blur)="isEditingDesc.set(false); saveDesc()" autofocus style="min-height: 120px;">
+              style="min-height: 120px; border-top-left-radius: 0; border-top-right-radius: 0;">
             </textarea>
-            <div style="font-size: 11px; color: var(--t3); margin-top: 4px;">Soporta Markdown: **negrita**, *cursiva*, - listas</div>
+            <div style="font-size: 11px; color: var(--t3); margin-top: 4px;">Soporta Markdown. Usa los botones superiores.</div>
           } @else {
             <div class="mc-desc-preview markdown-body" [innerHTML]="parsedDescription()" 
                  (click)="canEdit() ? isEditingDesc.set(true) : null"
