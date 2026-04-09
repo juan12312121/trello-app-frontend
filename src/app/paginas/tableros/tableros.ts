@@ -91,7 +91,7 @@ export class TablerosComponent implements OnInit, OnDestroy {
   tags = signal<Tag[]>([]);
   activity = signal<any[]>([]);
   otherBoards = signal<any[]>([]);
-  activeUsers = signal<any[]>([]); // New list of users currently connected to the board
+  activeUsers = signal<any[]>([]); 
   readonly today = new Date().toISOString().split('T')[0];
 
   // UI State
@@ -531,7 +531,8 @@ export class TablerosComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  dueClass(d: string | null): string {
+  dueClass(d: string | null, completada?: boolean): string {
+    if (completada) return 'done';
     if (!d) return '';
     if (d < this.today) return 'over';
     if (d === this.today) return 'today';

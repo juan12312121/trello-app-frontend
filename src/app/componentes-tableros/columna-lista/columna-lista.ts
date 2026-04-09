@@ -75,7 +75,8 @@ export class ColumnaListaComponent implements OnDestroy {
 
   public fmtDate = fmtDate;
 
-  dueClass(d: string | null): string {
+  dueClass(d: string | null, completada?: boolean): string {
+    if (completada) return 'done';
     const t = this.today();
     if (!d || !t) return '';
     if (d < t) return 'over';

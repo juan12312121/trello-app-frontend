@@ -31,6 +31,8 @@
     @for (card of list().cards || []; track card.id) {
         <div
           class="card"
+          [class.is-done]="card.completada"
+          [class.is-overdue]="!card.completada && dueClass(card.fecha_vencimiento) === 'over'"
           cdkDrag
           [cdkDragData]="card"
           [cdkDragDisabled]="!canEdit()"
@@ -76,11 +78,22 @@
 
           <!-- Vencimiento -->
           @if (card.fecha_vencimiento) {
-            <span class="c-badge badge-due" [ngClass]="dueClass(card.fecha_vencimiento)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 16 14"/>
-              </svg>
+            <span class="c-badge badge-due" [ngClass]="dueClass(card.fecha_vencimiento, card.completada)">
+              @if (card.completada) {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: #10b981;">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              } @else if (dueClass(card.fecha_vencimiento) === 'over') {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #ef4444;">
+                  <path d="M12 2C7 2 4 8 4 13C4 18 8 22 12 22C16 22 20 18 20 13C20 8 17 2 12 2Z"></path>
+                  <path d="M12 18H12.01M12 8V14"></path>
+                </svg>
+              } @else {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              }
               {{ fmtDate(card.fecha_vencimiento) }}
             </span>
           }
