@@ -74,3 +74,40 @@ export const groupByProp = <T>(items: T[], key: keyof T): Record<string, T[]> =>
     acc[val].push(item);
     return acc;
   }, {} as any);
+
+/** 
+ * UX MICRO-INTERACTIONS 
+ */
+
+export function playSuccessPop() {
+  try {
+    const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.15);
+    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 0.15);
+  } catch (e) { }
+}
+
+export function fireConfetti() {
+  try {
+    if ((window as any).confetti) {
+      (window as any).confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+    } else {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js';
+      script.onload = () => {
+        (window as any).confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+      };
+      document.body.appendChild(script);
+    }
+  } catch (e) {}
+}

@@ -1,5 +1,5 @@
-import { Component, input, output, signal, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, input, output, signal, OnDestroy, inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Lista, Tarjeta, Tag, User } from '../../core/models';
 import { fmtDate } from '../../core/utils/functions';
@@ -16,6 +16,7 @@ export class ColumnaListaComponent implements OnDestroy {
   tags      = input.required<Tag[]>();
   members   = input.required<any[]>(); // Dejamos como any para flexibilidad con tipos del board
   today     = input<string>('');
+  presenceMap = input<Record<number, any[]>>({}, { alias: 'cardViewers' }); // cardId -> list of users viewing it
   inlineCardAdded = output<{ listId: number; titulo: string }>();
 
   cardClicked     = output<number>();
@@ -27,27 +28,35 @@ export class ColumnaListaComponent implements OnDestroy {
 
   inlineVisible = signal(false);
   inlineText    = signal('');
-
-  tagsExpanded = signal(localStorage.getItem('trello_tags_ex') === 'true');
+  
+  private platformId = inject(PLATFORM_ID);
+  tagsExpanded = signal(false);
   
   private toggleListener = () => {
     this.tagsExpanded.set(localStorage.getItem('trello_tags_ex') === 'true');
   };
 
   constructor() {
-    window.addEventListener('trello_tags_toggled', this.toggleListener);
+    if (isPlatformBrowser(this.platformId)) {
+      this.tagsExpanded.set(localStorage.getItem('trello_tags_ex') === 'true');
+      window.addEventListener('trello_tags_toggled', this.toggleListener);
+    }
   }
 
   ngOnDestroy() {
-    window.removeEventListener('trello_tags_toggled', this.toggleListener);
+    if (isPlatformBrowser(this.platformId)) {
+      window.removeEventListener('trello_tags_toggled', this.toggleListener);
+    }
   }
 
   toggleTags(e: Event) {
     e.stopPropagation();
     const isEx = !this.tagsExpanded();
     this.tagsExpanded.set(isEx);
-    localStorage.setItem('trello_tags_ex', isEx.toString());
-    window.dispatchEvent(new Event('trello_tags_toggled'));
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('trello_tags_ex', isEx.toString());
+      window.dispatchEvent(new Event('trello_tags_toggled'));
+    }
   }
 
   showInline()  { this.inlineVisible.set(true); }

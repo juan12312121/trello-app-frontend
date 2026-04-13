@@ -1,5 +1,5 @@
-import { Component, inject, OnInit, OnDestroy, signal, computed, HostListener } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, OnDestroy, signal, computed, HostListener, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Router, ActivatedRoute } from '@angular/router';
 import { io, Socket } from 'socket.io-client';
@@ -17,7 +17,7 @@ import { ReminderService } from '../../core/services/reminder.service';
 import { InvitationService } from '../../core/services/invitation.service';
 import { TagService } from '../../core/services/tag.service';
 import { NotificationService } from '../../core/services/notification.service';
-import { getInitials, fmtDate, normalizeServerUrl, isImage, filterByProp } from '../../core/utils/functions';
+import { getInitials, fmtDate, normalizeServerUrl, isImage, filterByProp, playSuccessPop, fireConfetti } from '../../core/utils/functions';
 
 import { SidebarComponent } from '../../componentes-tableros/sidebar/sidebar';
 import { TopbarComponent } from '../../componentes-tableros/topbar/topbar';
@@ -73,6 +73,7 @@ export class TablerosComponent implements OnInit, OnDestroy {
   private tagService = inject(TagService);
   private router = inject(Router);
   private notifService = inject(NotificationService);
+  private platformId = inject(PLATFORM_ID);
 
   // ── Signals de Estado ──────────────────────────────────────────────
   board = signal<any>(null);
@@ -80,8 +81,12 @@ export class TablerosComponent implements OnInit, OnDestroy {
   activeCardId = signal<number | null>(null);
   
   // UI Selection
-  viewMode = signal<'kanban' | 'list' | 'calendar' | 'analytics'>('kanban');
+  viewMode = signal<'kanban' | 'list' | 'calendar' | 'timeline' | 'analytics'>('kanban');
   filterBy = signal<string | null>(null); // 'overdue', 'my-tasks', 'archived', 'attachments', 'tag-X'
+
+  // LIVE COLLABORATION
+  public otherCursors = signal<Record<string, {x: number, y: number, name: string, color: string}>>({});
+  public boardPresenceMap = signal<Record<number, any[]>>({}); // cardId -> list of users
   
   // Calendar State
   calendarDate = signal(new Date());
@@ -160,6 +165,7 @@ export class TablerosComponent implements OnInit, OnDestroy {
   }
 
   initSocket(boardId: number) {
+    if (!isPlatformBrowser(this.platformId)) return;
     if (this.socket) {
       this.socket.disconnect();
     }
@@ -182,6 +188,18 @@ export class TablerosComponent implements OnInit, OnDestroy {
       this.board.update(b => b ? { ...b, portada: data.portada } : b);
     });
 
+    // Escuchamos cursores
+    this.socket.on('board:cursor_update', (data: any) => {
+      this.otherCursors.update(prev => ({
+        ...prev,
+        [data.id]: { x: data.x, y: data.y, name: data.name, color: data.color }
+      }));
+    });
+
+    this.socket.on('board:presence_update', (data: { cardViewers: Record<number, any[]> }) => {
+      this.boardPresenceMap.set(data.cardViewers);
+    });
+
     // Escuchamos presencia en vivo
     this.socket.on('presence_update', (data: { activeUsers: any[] }) => {
       this.activeUsers.set(data.activeUsers || []);
@@ -193,6 +211,22 @@ export class TablerosComponent implements OnInit, OnDestroy {
       if (this.board()) this.socket.emit('leave_board', this.board().id);
       this.socket.disconnect();
     }
+  }
+
+  @HostListener('mousemove', ['$event'])
+  onMouseMove(e: MouseEvent) {
+    if (!isPlatformBrowser(this.platformId)) return;
+    if (!this.socket || !this.board()) return;
+    const user = this.authService.currentUser();
+    if (!user) return;
+
+    this.socket.emit('board:cursor_move', {
+      boardId: this.board().id,
+      x: e.clientX,
+      y: e.clientY,
+      name: user.nombre,
+      color: user.color || '#3b82f6'
+    });
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -552,8 +586,41 @@ export class TablerosComponent implements OnInit, OnDestroy {
   openDetail(cardId: number) {
     this.activeCardId.set(cardId);
     this.ui.showDetail.set(true);
+    
+    // Notificamos apertura
+    const user = this.authService.currentUser();
+    if (this.socket && this.board() && user) {
+      this.socket.emit('board:card_open', {
+        boardId: this.board().id,
+        cardId: cardId,
+        user: { id: user.id, nombre: user.nombre, color: user.color }
+      });
+    }
+  }
+
+  // ── TIMELINE HELPERS ──────────────────────────────────────────
+  getTimelineStyle(card: any) {
+    if (!card.fecha_vencimiento) return { 'margin-left': '10%', 'width': '20%' };
+    const date = new Date(card.fecha_vencimiento);
+    const day = date.getDate();
+    const margin = (day % 7) * 10;
+    const width = 15 + (card.titulo.length % 30);
+    return {
+      'margin-left': margin + '%',
+      'width': width + '%',
+      'background': card.portada || 'var(--blue)'
+    };
   }
   closeDetail() {
+    const cardId = this.activeCardId();
+    const user = this.authService.currentUser();
+    if (cardId && this.socket && user) {
+      this.socket.emit('board:card_close', {
+        boardId: this.board().id,
+        cardId,
+        userId: user.id
+      });
+    }
     this.activeCardId.set(null);
     this.ui.showDetail.set(false);
   }
@@ -728,6 +795,12 @@ export class TablerosComponent implements OnInit, OnDestroy {
     const detail = this.getCardDetail(e.cardId);
     if (!detail || !this.board()) return;
     
+    // Trigger micro-interactions when a card is freshly marked as completed
+    if (e.completada === true && !detail.card.completada) {
+      playSuccessPop();
+      fireConfetti();
+    }
+
     this.cardService.updateCard(this.board().id, detail.list.id, e.cardId, e).subscribe(() => {
       this.loadLists(this.board().id);
     });

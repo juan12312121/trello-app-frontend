@@ -136,9 +136,21 @@
               {{ mem.initials }}
             </div>
           }
-        </div>
+        </div><!-- /card-footer -->
 
-      </div><!-- /card -->
+          <!-- Card Viewers Presence (Bubbles) -->
+          @let viewers = presenceMap()[card.id];
+          @if (viewers && viewers.length > 0) {
+            <div class="card-viewers-presence">
+              @for (v of viewers; track v.id) {
+                <div class="presence-av" [style.background]="v.color" [title]="v.nombre + ' está viendo esta tarjeta'">
+                  {{ (v.nombre || 'A').charAt(0).toUpperCase() }}
+                </div>
+              }
+            </div>
+          }
+
+        </div><!-- /card -->
     }
 
   </div><!-- /col-body -->

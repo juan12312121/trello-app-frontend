@@ -102,4 +102,11 @@
       </svg>
     </button>
   </div>
+
+  <!-- FLYING EMOJIS LAYER -->
+  <div class="flying-emojis-container">
+    @for (e of flyingEmojis(); track e.id) {
+      <div class="flying-emoji" [style.left.px]="e.x" [style.top.px]="e.y">{{ e.emoji }}</div>
+    }
+  </div>
 </div>

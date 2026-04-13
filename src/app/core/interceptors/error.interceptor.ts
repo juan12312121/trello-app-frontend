@@ -4,7 +4,11 @@ import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import Swal from 'sweetalert2';
 
+import { PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
+  const platformId = inject(PLATFORM_ID);
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       // 1. Log detallado para consola del frontend (solo para debug)
@@ -37,9 +41,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
               userTitle = 'No Autorizado';
               // Aquí en el futuro puedes hacer un logout forzado
               if (req.url.indexOf('/login') === -1) {
-                   localStorage.removeItem('token');
-                   // Opcional: inyectar el router y redireccionar
+                   if (isPlatformBrowser(platformId)) {
+                        localStorage.removeItem('token');
+                   }
               }
+              // Opcional: inyectar el router y redireccionar
           } else if (error.status === 403) {
               userMessage = error.error?.message || 'No tienes permisos suficientes para realizar esta acción.';
               userTitle = 'Acceso Denegado';
@@ -59,13 +65,15 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       // 3. Mostrar la alerta SweetAlert2 de manera amigable
-      Swal.fire({
-          icon: 'error',
-          title: userTitle,
-          text: userMessage,
-          confirmButtonText: 'Entendido',
-          confirmButtonColor: '#3f51b5'
-      });
+      if (isPlatformBrowser(platformId)) {
+        Swal.fire({
+            icon: 'error',
+            title: userTitle,
+            text: userMessage,
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#3f51b5'
+        });
+      }
 
       // Retornar el observable arrojando nuevamente el error
       return throwError(() => error);

@@ -25,7 +25,7 @@ export class VistaTablerosComponent {
   private cardService = inject(CardService);
   private reminderService = inject(ReminderService);
   private notificationService = inject(NotificationService);
-  private authService = inject(AuthService);
+  public authService = inject(AuthService);
 
   public isImage = isImage;
 
@@ -38,6 +38,7 @@ export class VistaTablerosComponent {
   showCreateBoard = signal(false);
   activeMenuBoardId = signal<number | null>(null);
   activeTab = signal<'all' | 'owner' | 'member' | 'archived'>('all');
+  isWorkspaceView = signal(false);
 
   // Signals para estadísticas centralizadas y filtro
   boards = computed(() => {
@@ -60,6 +61,20 @@ export class VistaTablerosComponent {
 
     if (!term) return allBoards;
     return allBoards.filter(b => b.nombre.toLowerCase().includes(term));
+  });
+
+  groupedBoards = computed(() => {
+    const list = this.boards();
+    const groups: Record<string, any[]> = {};
+    
+    list.forEach(b => {
+      // Usamos el ID del propietario como clave de grupo
+      const key = b.usuario_propietario_id === this.authService.currentUser()?.id ? 'Mis Tableros' : 'Compartidos conmigo';
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(b);
+    });
+    
+    return Object.entries(groups).map(([name, boards]) => ({ name, boards }));
   });
   totalBoards = computed(() => this.boards().length);
   totalLists = computed(() => this.boards().reduce((s, b) => s + (b.total_columnas || 0), 0));

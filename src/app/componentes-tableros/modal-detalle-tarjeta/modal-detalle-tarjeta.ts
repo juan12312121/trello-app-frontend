@@ -90,6 +90,17 @@ export class ModalDetalleTarjetaComponent extends BaseModalComponent implements 
       this.descripcion.set(c.descripcion ?? '');
       this.moveToListId.set(l.id);
       this.loadCardExtras(c.id);
+      
+      // Intentar cargar campos personalizados de la descripción si existen como JSON oculto
+      // Formato: <!--CF:JSON_DATA-->
+      const cfMatch = c.descripcion?.match(/<!--CF:(.*)-->/);
+      if (cfMatch) {
+        try {
+          this.customFields.set(JSON.parse(cfMatch[1]));
+        } catch (e) { this.customFields.set([]); }
+      } else {
+        this.customFields.set([]);
+      }
     });
   });
 
@@ -112,6 +123,10 @@ export class ModalDetalleTarjetaComponent extends BaseModalComponent implements 
   showReminderInput = signal(false);
   remDate     = signal('');
   remNote     = signal('');
+
+  // CAMPOS PERSONALIZADOS
+  showCustomFieldsPicker = signal(false);
+  customFields = signal<{id: string, name: string, type: 'text'|'number'|'select'|'date', value: any, options?: string[]}[]>([]);
 
   ngOnInit() { }
 
@@ -152,7 +167,47 @@ export class ModalDetalleTarjetaComponent extends BaseModalComponent implements 
   }
 
   saveDesc() {
-    this.cardUpdated.emit({ cardId: this.card().id, descripcion: this.descripcion().trim() });
+    let rawDesc = this.descripcion().trim();
+    // Limpiamos metadata vieja
+    rawDesc = rawDesc.replace(/<!--CF:.*-->/, '').trim();
+    
+    // Añadimos nueva metadata si hay campos
+    const cf = this.customFields();
+    if (cf.length > 0) {
+      rawDesc += `\n\n<!--CF:${JSON.stringify(cf)}-->`;
+    }
+    
+    this.cardUpdated.emit({ cardId: this.card().id, descripcion: rawDesc });
+  }
+
+  addCustomField(type: 'text' | 'number' | 'select' | 'date') {
+    const name = prompt('Nombre del campo:');
+    if (!name) return;
+    
+    const newField: any = {
+      id: Math.random().toString(36).substr(2, 9),
+      name,
+      type,
+      value: type === 'number' ? 0 : '',
+    };
+    
+    if (type === 'select') {
+      const opts = prompt('Opciones separadas por coma:');
+      newField.options = opts ? opts.split(',').map(o => o.trim()) : [];
+    }
+    
+    this.customFields.update(prev => [...prev, newField]);
+    this.saveDesc();
+  }
+
+  updateCfValue(id: string, val: any) {
+    this.customFields.update(prev => prev.map(f => f.id === id ? { ...f, value: val } : f));
+    // No guardamos en cada tecla para no saturar, el usuario puede darle a "Guardar" o esperar a blur
+  }
+
+  removeCustomField(id: string) {
+    this.customFields.update(prev => prev.filter(f => f.id !== id));
+    this.saveDesc();
   }
 
   insertMarkdown(prefix: string, suffix: string = '') {

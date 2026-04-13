@@ -1,5 +1,5 @@
-import { Component, Input, Output, EventEmitter, inject, signal, computed, ViewChild, ElementRef, OnChanges, SimpleChanges, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, Output, EventEmitter, inject, signal, computed, ViewChild, ElementRef, OnChanges, SimpleChanges, OnInit, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../core/services/auth.service';
@@ -37,12 +37,15 @@ export class BoardChatComponent implements OnChanges, OnInit {
 
   private auth = inject(AuthService);
   private http = inject(HttpClient);
+  private platformId = inject(PLATFORM_ID);
   private readonly apiUrl = environment.apiUrl;
 
   messages = signal<ChatMessage[]>([]);
   onlineUsers = signal<any[]>([]);
   typingUser = signal<string | null>(null);
   searchQuery = signal('');
+  flyingEmojis = signal<{ id: number; emoji: string; x: number; y: number }[]>([]);
+  private emojiId = 0;
   
   filteredMessages = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
@@ -57,7 +60,9 @@ export class BoardChatComponent implements OnChanges, OnInit {
 
   ngOnInit() {
     this.loadHistory();
-    setTimeout(() => this.chatInput?.nativeElement.focus(), 500);
+    if (isPlatformBrowser(this.platformId)) {
+      setTimeout(() => this.chatInput?.nativeElement.focus(), 500);
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -85,7 +90,12 @@ export class BoardChatComponent implements OnChanges, OnInit {
       this.onlineUsers.set(users);
     });
 
-    this.socket.on('board:reaction_update', (data: any) => {
+    this.socket.on('board:reaction_update', (data: { messageId: any; action: string; emoji: string; userId: number }) => {
+      // Trigger flying animation
+      if (data.action === 'added') {
+        this.spawnEmoji(data.emoji);
+      }
+      
       this.messages.update(prev => prev.map(m => {
         if (m.id === data.messageId) {
           const reactions = m.reactions || [];
@@ -106,6 +116,18 @@ export class BoardChatComponent implements OnChanges, OnInit {
     });
 
     this.socketListening = true;
+  }
+
+  private spawnEmoji(emoji: string) {
+    const id = this.emojiId++;
+    const x = 50 + Math.random() * 150; // Posición aleatoria en el chat
+    const y = isPlatformBrowser(this.platformId) ? window.innerHeight - 150 : 500;
+    
+    this.flyingEmojis.update(prev => [...prev, { id, emoji, x, y }]);
+    
+    setTimeout(() => {
+      this.flyingEmojis.update(prev => prev.filter(e => e.id !== id));
+    }, 2000);
   }
 
   toggleReaction(messageId: string | number, emoji: string) {

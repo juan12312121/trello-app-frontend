@@ -11,11 +11,17 @@
       <button class="filter-btn" [class.active]="activeTab() === 'all'" (click)="activeTab.set('all')">Todos</button>
       <button class="filter-btn" [class.active]="activeTab() === 'owner'" (click)="activeTab.set('owner')">Propietario</button>
       <button class="filter-btn" [class.active]="activeTab() === 'member'" (click)="activeTab.set('member')">Miembro</button>
-      <button class="filter-btn" [class.active]="activeTab() === 'archived'" (click)="activeTab.set('archived')">Archivados</button>
-    </div>
+       <button class="filter-btn" [class.active]="activeTab() === 'archived'" (click)="activeTab.set('archived')">Archivados</button>
+       <div class="header-divider" style="width:1px; height:20px; background:var(--bd2); margin:0 10px;"></div>
+       <button class="filter-btn" [class.active]="isWorkspaceView()" (click)="isWorkspaceView.set(!isWorkspaceView())">
+         <svg viewBox="0 0 24 24" style="width:14px; height:14px;" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+         Vista de Espacios
+       </button>
+     </div>
   </div>
 
   <!-- Boards Grid -->
+  @if (!isWorkspaceView()) {
   <div class="boards-grid" id="boardsGrid">
     
     <!-- Add new board card (Always visible first on every page) -->
@@ -90,8 +96,55 @@
     }
 
   </div>
+  } @else {
+    <!-- Workspace View (Grouped) -->
+    <div class="workspace-view" style="padding: 10px 0;">
+      @for (group of groupedBoards(); track group.name) {
+        <div class="workspace-group" style="margin-bottom:48px;">
+          <div class="workspace-hdr" style="display:flex; align-items:center; gap:16px; margin-bottom:24px; padding-bottom:12px; border-bottom:1px solid var(--bd2);">
+            <div class="workspace-av" style="width:48px; height:48px; background:linear-gradient(135deg, var(--blue), #6366f1); border-radius:12px; display:flex; align-items:center; justify-content:center; color:white; font-weight:800; font-size:1.2rem; box-shadow:0 4px 12px rgba(59, 130, 246, 0.3);">
+              {{ group.name.charAt(0) }}
+            </div>
+            <div>
+              <h2 class="workspace-title" style="margin:0; font-family:'Outfit'; font-size:1.5rem; color:var(--t1); letter-spacing:-0.5px;">{{ group.name }}</h2>
+              <div style="font-size:0.8rem; color:var(--t3); font-weight:500;">{{ group.boards.length }} tableros activos</div>
+            </div>
+          </div>
+          
+          <div class="boards-grid">
+            @for (board of group.boards; track board.id) {
+              <article class="board-card" (click)="openBoard(board)">
+                <div class="board-cover" 
+                     [ngClass]="!isImage(board.portada) ? (board.portada || 'c-blue') : ''" 
+                     [style.backgroundImage]="isImage(board.portada) ? normalizeUrl(board.portada) : ''">
+                  @if (board.usuario_propietario_id === authService.currentUser()?.id) {
+                    <span class="board-badge">Propietario</span>
+                  }
+                  <div class="board-cover-dot"></div>
+                </div>
+                <div class="board-body">
+                  <h3 class="board-title">{{ board.nombre }}</h3>
+                  <p class="board-desc">{{ board.descripcion || 'Sin descripción' }}</p>
+                  <div class="board-meta">
+                    <div class="meta-item">
+                      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="4" rx="1"/><rect x="3" y="10" width="18" height="4" rx="1"/><rect x="3" y="17" width="10" height="4" rx="1"/></svg>
+                      {{ board.total_columnas || 0 }}
+                    </div>
+                    <div class="meta-item">
+                      <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                      {{ board.total_tarjetas || 0 }}
+                    </div>
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
   
-  @if (boards().length > 0) {
+  @if (!isWorkspaceView() && boards().length > 0) {
     <div class="pagination-controls-b">
       <button [disabled]="currentPage() === 1" (click)="prevPage()" class="btn-page-b">Anterior</button>
       <span class="page-info-b">Página {{ currentPage() }} de {{ totalPages() || 1 }}</span>

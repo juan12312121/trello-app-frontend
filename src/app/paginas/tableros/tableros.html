@@ -41,7 +41,7 @@
 
       @for (list of activeLists(); track list.id) {
       <app-columna-lista [list]="list" [tags]="tags()" [members]="board().miembros || []" [today]="today"
-        [canEdit]="canEdit()" (cardClicked)="openDetail($event)" (openCreateCard)="openCreateCard($event)"
+        [canEdit]="canEdit()" [cardViewers]="boardPresenceMap()" (cardClicked)="openDetail($event)" (openCreateCard)="openCreateCard($event)"
         (ctxMenu)="openCtx($event)" (listRenamed)="onListRenamed($event)" (inlineCardAdded)="onInlineCardAdded($event)"
         (cardDropped)="onCardDropped($event)">
       </app-columna-lista>
@@ -162,6 +162,33 @@
           </div>
         </div>
         }
+      </div>
+    </div>
+    } @else if (viewMode() === 'timeline') {
+    <div class="timeline-container">
+      <div class="timeline-header">
+        <h2>Vista de Cronograma (Gantt)</h2>
+        <p>Visualiza el progreso de las tareas a lo largo del tiempo.</p>
+      </div>
+      <div class="timeline-canvas">
+        <div class="timeline-grid-header">
+          <div class="tg-label">Tarjeta</div>
+          @for (d of [1,2,3,4,5,6,7]; track d) {
+            <div class="tg-day">Día {{d}}</div>
+          }
+        </div>
+        <div class="timeline-body">
+          @for (card of allCardsFiltered(); track card.id) {
+            <div class="timeline-row">
+              <div class="tr-label" (click)="openDetail(card.id)">{{ card.titulo }}</div>
+              <div class="tr-track">
+                <div class="tr-bar" [style.marginLeft.%] ="10" [style.width.%]="30" [style.background]="card.portada || 'var(--blue)'">
+                  <span class="tr-bar-label">{{ card.prioridad }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
       </div>
     </div>
     } @else if (viewMode() === 'analytics') {
@@ -304,6 +331,18 @@
   @if (ui.showChat()) {
     <app-board-chat [boardId]="board().id" [socket]="socket" (close)="ui.showChat.set(false)"></app-board-chat>
   }
+
+  <!-- LIVE CURSORS LAYER -->
+  <div class="live-cursors-layer">
+    @for (cur of otherCursors() | keyvalue; track cur.key) {
+      <div class="live-cursor" [style.left.px]="cur.value.x" [style.top.px]="cur.value.y">
+        <svg viewBox="0 0 24 24" [style.fill]="cur.value.color">
+          <path d="M5.5 3.21l14.12 6.54c1.19.55 1.1 2.26-.14 2.68l-5.43 1.83-1.83 5.43c-.42 1.24-2.13 1.33-2.68.14L3.21 5.5c-.5-1.07.43-2.22 1.5-1.72z" />
+        </svg>
+        <span class="cursor-label" [style.background]="cur.value.color">{{ cur.value.name }}</span>
+      </div>
+    }
+  </div>
 
 </div>
 } @else {

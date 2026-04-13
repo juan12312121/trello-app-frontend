@@ -826,3 +826,158 @@
 .sk-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
 .sk-icon { height: 16px; width: 30px; border-radius: 4px; }
 .sk-avatar { height: 24px; width: 24px; border-radius: 50%; }
+
+/* ── LIVE COLLABORATION ────────────────────────────────────────── */
+.live-cursors-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10000;
+  overflow: hidden;
+}
+
+.live-cursor {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.1s linear;
+}
+
+.live-cursor svg {
+  width: 20px;
+  height: 20px;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+}
+
+.cursor-label {
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: var(--sh-md);
+}
+
+.card-viewers-presence {
+  display: flex;
+  flex-direction: row-reverse;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--bd2);
+  gap: -4px;
+}
+
+.presence-av {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 800;
+  color: #fff;
+  margin-left: -6px;
+  cursor: help;
+  transition: transform 0.2s;
+}
+
+.presence-av:hover {
+  transform: translateY(-4px) scale(1.2);
+  z-index: 10;
+}
+
+/* ── TIMELINE (GANTT) VIEW ────────────────────────────────────────── */
+.timeline-container {
+  flex: 1;
+  padding: 30px;
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  margin: 10px 20px 20px;
+  border-radius: var(--r-xl);
+  border: 1px solid var(--bd2);
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-canvas {
+  margin-top: 20px;
+  border: 1px solid var(--bd2);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  min-width: 800px;
+}
+
+.timeline-grid-header {
+  display: grid;
+  grid-template-columns: 200px repeat(7, 1fr);
+  background: var(--s2);
+  border-bottom: 1px solid var(--bd2);
+}
+
+.tg-label, .tg-day {
+  padding: 12px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--t3);
+  text-align: center;
+}
+
+.tg-label { text-align: left; border-right: 1px solid var(--bd2); }
+
+.timeline-row {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  border-bottom: 1px solid var(--bd);
+}
+
+.tr-label {
+  padding: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--t1);
+  border-right: 1px solid var(--bd2);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tr-label:hover {
+  background: var(--s2);
+  color: var(--blue);
+}
+
+.tr-track {
+  position: relative;
+  background: repeating-linear-gradient(90deg, transparent, transparent calc(100% / 7 - 1px), var(--bd) calc(100% / 7 - 1px), var(--bd) calc(100% / 7));
+  padding: 10px 0;
+}
+
+.tr-bar {
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  box-shadow: var(--sh-sm);
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.tr-bar:hover {
+  transform: scale(1.02);
+  filter: brightness(1.1);
+}
+
+.tr-bar-label {
+  font-size: 0.7rem;
+  color: #fff;
+  font-weight: 700;
+  text-transform: uppercase;
+}

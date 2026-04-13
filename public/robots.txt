@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /board/
+Disallow: /dashboard
+
+Sitemap: https://tu-dominio.com/sitemap.xml

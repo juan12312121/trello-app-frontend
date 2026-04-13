@@ -1,4 +1,5 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+import { Injectable, signal, computed, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { catchError, map, Observable, of, tap } from 'rxjs';
@@ -11,6 +12,7 @@ import { User, LoginResponse } from '../models';
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private platformId = inject(PLATFORM_ID);
   private readonly apiUrl = environment.apiUrl;
 
   // Signals para estado de autenticación
@@ -23,15 +25,17 @@ export class AuthService {
   }
 
   private loadStorage() {
-    const savedToken = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
+    if (isPlatformBrowser(this.platformId)) {
+      const savedToken = localStorage.getItem('token');
+      const savedUser = localStorage.getItem('user');
 
-    if (savedToken && savedUser) {
-      try {
-        this.token.set(savedToken);
-        this.currentUser.set(JSON.parse(savedUser));
-      } catch (e) {
-        this.logout();
+      if (savedToken && savedUser) {
+        try {
+          this.token.set(savedToken);
+          this.currentUser.set(JSON.parse(savedUser));
+        } catch (e) {
+          this.logout();
+        }
       }
     }
   }
@@ -42,8 +46,10 @@ export class AuthService {
         if (res.success) {
           this.token.set(res.data.token);
           this.currentUser.set(res.data.user);
-          localStorage.setItem('token', res.data.token);
-          localStorage.setItem('user', JSON.stringify(res.data.user));
+          if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem('token', res.data.token);
+            localStorage.setItem('user', JSON.stringify(res.data.user));
+          }
         }
       })
     );
@@ -55,8 +61,10 @@ export class AuthService {
         if (res.success) {
           this.token.set(res.data.token);
           this.currentUser.set(res.data.user);
-          localStorage.setItem('token', res.data.token);
-          localStorage.setItem('user', JSON.stringify(res.data.user));
+          if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem('token', res.data.token);
+            localStorage.setItem('user', JSON.stringify(res.data.user));
+          }
         }
       })
     );
@@ -65,8 +73,10 @@ export class AuthService {
   logout() {
     this.token.set(null);
     this.currentUser.set(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
     this.router.navigate(['/']);
   }
 
@@ -75,7 +85,9 @@ export class AuthService {
       tap(res => {
         if (res.success) {
           this.currentUser.set(res.data.user);
-          localStorage.setItem('user', JSON.stringify(res.data.user));
+          if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem('user', JSON.stringify(res.data.user));
+          }
         }
       })
     );
