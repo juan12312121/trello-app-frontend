@@ -200,6 +200,17 @@ export class TablerosComponent implements OnInit, OnDestroy {
       this.boardPresenceMap.set(data.cardViewers);
     });
 
+    // Escuchamos actividad nueva en tiempo real
+    this.socket.on('board:new_activity', (data: any) => {
+      // 1. Mostrar toast sutil
+      if (data.userId !== this.authService.currentUser()?.id) {
+        this.notifService.notify(data.descripcion, 'info');
+      }
+      
+      // 2. Podríamos recargar la lista de actividad o notificaciones si fuera necesario
+      this.loadActivity(boardId);
+    });
+
     // Escuchamos presencia en vivo
     this.socket.on('presence_update', (data: { activeUsers: any[] }) => {
       this.activeUsers.set(data.activeUsers || []);

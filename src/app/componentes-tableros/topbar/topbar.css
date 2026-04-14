@@ -91,6 +91,11 @@
 }
 .btn-icon svg { width: 13px; height: 13px; }
 .btn-icon:hover { background: var(--s2); color: var(--t1); }
+.btn-icon.active { background: var(--blue-l); border-color: var(--blue); color: var(--blue); }
+
+.mi { width: 16px; height: 16px; opacity: 0.7; transition: 0.2s; margin-right: 10px; }
+.theme-item:hover .mi { opacity: 1; transform: scale(1.1); }
+.theme-item.active .mi { color: var(--blue); opacity: 1; }
 
 .btn-sm {
   display: flex; align-items: center; gap: 5px;
@@ -117,12 +122,25 @@
   border-radius: 10px;
   border: 2px solid var(--surface);
   line-height: 1;
+  animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(244, 63, 94, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
 }
 
 .btn-icon.has-notifs {
   color: #f43f5e;
   border-color: #fca5a5;
   background: #fff1f2;
+  animation: bell-shake 0.5s ease infinite alternate;
+}
+
+@keyframes bell-shake {
+  0% { transform: rotate(0); }
+  100% { transform: rotate(10deg); }
 }
 
 .notif-dropdown {

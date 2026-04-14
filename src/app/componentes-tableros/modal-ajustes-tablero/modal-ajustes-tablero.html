@@ -115,63 +115,74 @@
         <!-- BACKGROUND -->
         @if (activeTab() === 'background') {
           <h3 class="panel-title">Fondo del Tablero</h3>
-          <p class="panel-desc">Elige un color sólido o sube una imagen de fondo.</p>
+          <p class="panel-desc">Dale un toque único a tu espacio de trabajo.</p>
           
           <div class="settings-group">
-            <div class="set-row" style="flex-direction:column; align-items:flex-start; gap:12px;">
-              <strong>Color Sólido (Hexadecimal)</strong>
-              <div style="display:flex; gap:8px; align-items:center;">
-                <input type="color" [value]="newBgColor()" (input)="newBgColor.set($any($event.target).value)" style="height:32px; width:48px; cursor:pointer; border:none; padding:0; background:transparent;">
-                <button class="btn-move" [disabled]="!isAdmin()" (click)="applyBgColor()">Aplicar Color</button>
+            <div class="set-row-special">
+              <span class="set-label">Color Sólido Personalizado</span>
+              <div class="color-picker-wrap">
+                <input type="color" [value]="newBgColor()" (input)="newBgColor.set($any($event.target).value)">
+                <button class="btn-apply" [disabled]="!isAdmin()" (click)="applyBgColor()">Aplicar Hex</button>
               </div>
             </div>
             
-            <div class="set-row" style="flex-direction:column; align-items:flex-start; gap:12px; margin-top:20px;">
-              <strong>Imagen de Fondo</strong>
-              <p style="font-size:12px; color:var(--t3); margin:0;">Sube un archivo .jpg o .png para establecerlo como fondo del tablero.</p>
+            <div class="set-row-special">
+              <span class="set-label">Imagen de Fondo Local</span>
+              <p class="set-hint">Compatible con JPG y PNG de alta resolución.</p>
               <input type="file" accept="image/*" #bgFileInput style="display:none" (change)="applyBgImage($event)">
-              <button class="btn-save-card" [disabled]="!isAdmin()" (click)="bgFileInput.click()">Subir Imagen</button>
+              <button class="btn-upload" [disabled]="!isAdmin()" (click)="bgFileInput.click()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px; height:16px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Subir desde mi equipo
+              </button>
             </div>
             
-            <div class="set-row" style="flex-direction:column; align-items:flex-start; gap:12px; margin-top:20px;">
-              <strong>Colores predefinidos</strong>
-              <div style="display:flex; gap:8px;">
-                <div style="width:32px;height:32px;background:#93c5fd;border-radius:4px;cursor:pointer;" (click)="applyPredefinedBg('c-blue')" title="Azul"></div>
-                <div style="width:32px;height:32px;background:#a78bfa;border-radius:4px;cursor:pointer;" (click)="applyPredefinedBg('c-purple')" title="Morado"></div>
-                <div style="width:32px;height:32px;background:#34d399;border-radius:4px;cursor:pointer;" (click)="applyPredefinedBg('c-green')" title="Verde"></div>
-                <div style="width:32px;height:32px;background:#fb923c;border-radius:4px;cursor:pointer;" (click)="applyPredefinedBg('c-orange')" title="Naranja"></div>
-                <div style="width:32px;height:32px;background:#f472b6;border-radius:4px;cursor:pointer;" (click)="applyPredefinedBg('c-pink')" title="Rosa"></div>
+            <div class="set-row-special">
+              <span class="set-label">Colores Predefinidos</span>
+              <div class="predefined-grid">
+                <div class="color-circle c-blue" (click)="applyPredefinedBg('c-blue')" title="Azul Profundo"></div>
+                <div class="color-circle c-purple" (click)="applyPredefinedBg('c-purple')" title="Morado Neón"></div>
+                <div class="color-circle c-green" (click)="applyPredefinedBg('c-green')" title="Esmeralda"></div>
+                <div class="color-circle c-orange" (click)="applyPredefinedBg('c-orange')" title="Ámbar"></div>
+                <div class="color-circle c-pink" (click)="applyPredefinedBg('c-pink')" title="Rosa Pastel"></div>
               </div>
             </div>
 
             <!-- UNSPLASH GALLERY -->
-            <div class="set-row" style="flex-direction:column; align-items:flex-start; gap:12px; margin-top:20px; border-top: 1px solid var(--bd2); padding-top: 20px;">
-              <strong>Galería de Unsplash 🏔️</strong>
-              <p style="font-size:12px; color:var(--t3); margin:0;">Busca miles de fondos gratuitos en alta resolución.</p>
+            <div class="set-row-special unsplash-sec">
+              <span class="set-label">Galería Unsplash 🏔️</span>
+              <p class="set-hint">Busca entre millones de fotos profesionales.</p>
               
-              <div style="display:flex; gap:8px; width: 100%;">
-                <input type="text" class="tf-input" style="flex:1;" placeholder="Ej: space, nature, minimal..." 
+              <div class="search-box">
+                <input type="text" placeholder="Ej: space, minimal, nature..." 
                   [value]="unsplashQuery()" (input)="unsplashQuery.set($any($event.target).value)" (keydown.enter)="searchUnsplash()">
-                <button class="btn-move" (click)="searchUnsplash()">Buscar</button>
+                <button (click)="searchUnsplash()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                </button>
               </div>
-
+              
               @if (unsplashLoading()) {
-                <div class="spinner" style="margin: 20px auto;"></div>
+                <div class="unsplash-loading">
+                  <div class="spinner"></div>
+                  <span>Buscando inspiración...</span>
+                </div>
               } @else if (unsplashPhotos().length > 0) {
-                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; margin-top: 10px;">
+                <div class="unsplash-grid">
                   @for (photo of unsplashPhotos(); track photo.id) {
-                    <div style="position:relative; width: 100%; padding-bottom: 60%; cursor:pointer; border-radius:6px; overflow:hidden;" (click)="applyUnsplashBg(photo.urls.regular)">
-                      <img [src]="photo.urls.small" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <div class="u-photo" (click)="applyUnsplashBg(photo.urls.regular)">
+                      <img [src]="photo.urls.small" alt="Unsplash background">
+                      <div class="u-overlay">
+                        <span>Seleccionar</span>
+                      </div>
                     </div>
                   }
                 </div>
               } @else if (unsplashError()) {
-                <div style="color: #f87171; font-size: 13px; margin-top:10px;">{{ unsplashError() }}</div>
+                <div class="error-msg">{{ unsplashError() }}</div>
               }
             </div>
           </div>
           @if (!isAdmin()) {
-            <p style="color:red; font-size:12px; margin-top:20px;">Solo el dueño o administrador del tablero puede modificar el fondo.</p>
+            <p class="admin-only-msg">Solo el dueño puede modificar el fondo.</p>
           }
         }
 
