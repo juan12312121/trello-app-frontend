@@ -29,6 +29,7 @@ export class CardService extends BaseService {
   }
 
   moveCard(boardId: number, listId: number, cardId: number, destListId: number, posicion: number): Observable<{success: boolean, data: Tarjeta}> {
+    console.log(`🌐 [Web] Moviendo Tarjeta ${cardId} | De Lista: ${listId} -> A Lista: ${destListId} | Pos: ${posicion}`);
     return this.patch<{success: boolean, data: Tarjeta}>(`/boards/${boardId}/lists/${listId}/cards/${cardId}/move`, {
       listId: destListId,
       posicion

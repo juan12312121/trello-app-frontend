@@ -355,6 +355,7 @@ export class ModalDetalleTarjetaComponent extends BaseModalComponent implements 
 
   moveCard() {
     const tid = this.moveToListId();
+    console.log('📦 [Web Modal] Solicitando mover a lista ID:', tid);
     if (tid && tid !== this.list().id) {
       this.cardMoved.emit({ cardId: this.card().id, targetListId: tid });
     }

@@ -760,8 +760,12 @@ export class TablerosComponent implements OnInit, OnDestroy {
       const sourceListId = parseInt(e.previousContainer.id.replace('list-', ''), 10);
       const targetListId = payload.listId;
 
-      this.cardService.moveCard(boardId, sourceListId, card.id, targetListId, e.currentIndex).subscribe(() => {
-        this.checkAutomations(card.id, targetListId);
+      this.cardService.moveCard(boardId, sourceListId, card.id, targetListId, e.currentIndex).subscribe({
+        next: (res) => {
+          console.log('✅ [Web] Movimiento Drag&Drop exitoso:', res);
+          this.checkAutomations(card.id, targetListId);
+        },
+        error: (err) => console.error('❌ [Web] Error en Movimiento Drag&Drop:', err)
       });
     }
   }
@@ -774,12 +778,16 @@ export class TablerosComponent implements OnInit, OnDestroy {
     if (!sourceDetail) return;
 
     this.cardService.moveCard(boardId, sourceDetail.list.id, e.cardId, e.targetListId, 0).subscribe({
-      next: () => {
+      next: (res) => {
+        console.log('✅ [Web] Movimiento desde Detalle exitoso:', res);
         this.loadLists(boardId);
         this.checkAutomations(e.cardId, e.targetListId);
-        this.ui.showDetail.set(false); // Cerrar tarjeta para indicar que se movió exitosamente
+        this.ui.showDetail.set(false);
       },
-      error: () => this.loadLists(boardId)
+      error: (err) => {
+        console.error('❌ [Web] Error en Movimiento desde Detalle:', err);
+        this.loadLists(boardId);
+      }
     });
   }
 
